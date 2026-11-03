@@ -46,6 +46,18 @@ public class TaskManager
 		return true;
 	}
 
+	public bool DeleteTask(int id)
+	{
+		var taskIndex = tasks.FindIndex(t => t.Id == id);
+
+		if (taskIndex == -1)
+			return false;
+
+		tasks.RemoveAt(taskIndex);
+
+		return true;
+	}
+
 	public TaskItem? FindById(int id) => tasks
 		.FirstOrDefault(t => t.Id == id);
 
