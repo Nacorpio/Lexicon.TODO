@@ -1,14 +1,19 @@
-﻿namespace Lexicon.TODO;
+﻿using System.Globalization;
+
+namespace Lexicon.TODO;
 
 public static class InputHelper 
 {
+	private static string ReadLineOrThrow() =>
+		Console.ReadLine() ?? throw new EndOfStreamException("Input ended.");
+
 	public static string ReadNonEmptyString(string prompt)
 	{
 		while (true)
 		{
 			Console.Write(prompt);
 
-			var input = Console.ReadLine();
+			var input = ReadLineOrThrow();
 
 			if (!string.IsNullOrWhiteSpace(input))
 				return input;
@@ -21,7 +26,7 @@ public static class InputHelper
 	{
 		Console.Write(prompt);
 
-		var input = Console.ReadLine();
+		var input = ReadLineOrThrow();
 
 		return string.IsNullOrWhiteSpace(input) 
 			? null 
@@ -34,7 +39,7 @@ public static class InputHelper
 		{
 			Console.Write(prompt);
 
-			var input = Console.ReadLine();
+			var input = ReadLineOrThrow();
 
 			if (int.TryParse(input, out var result))
 				return result;
@@ -49,9 +54,12 @@ public static class InputHelper
 		{
 			Console.Write(prompt);
 
-			var input = Console.ReadLine();
+			var input = ReadLineOrThrow();
 
-			if (DateTime.TryParse(input, out var result))
+			if (DateTime.TryParseExact(input, "yyyy-MM-dd", 
+				CultureInfo.InvariantCulture, 
+				DateTimeStyles.None, 
+				out var result))
 				return result;
 
 			Console.WriteLine("Invalid date format. Please try again.");
