@@ -4,5 +4,6 @@ public enum MenuOption
 {
 	AddTask = 1,
 	ShowTasks = 2,
-	Exit = 3
+	CompleteTask = 3,
+	Exit = 4
 }
