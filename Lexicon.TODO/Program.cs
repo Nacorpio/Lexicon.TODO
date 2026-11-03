@@ -6,25 +6,25 @@ try
 {
 	while (true)
 	{
-		ShowMenu();
+		MenuHelper.Show<MainMenuOption>(option => option.ToLabel());
 
 		var choice = InputHelper.ReadInt("Enter your choice: ");
 
-		switch ((MenuOption)choice)
+		switch ((MainMenuOption)choice)
 		{
-			case MenuOption.AddTask:
+			case MainMenuOption.AddTask:
 				HandleAddTask(taskManager);
 				break;
 
-			case MenuOption.ShowTasks:
+			case MainMenuOption.ShowTasks:
 				HandleShowTasks(taskManager);
 				break;
 
-			case MenuOption.CompleteTask:
+			case MainMenuOption.CompleteTask:
 				HandleCompleteTask(taskManager);
 				break;
 
-			case MenuOption.Exit:
+			case MainMenuOption.Exit:
 				Console.WriteLine("Exiting...");
 				return;
 
@@ -60,24 +60,6 @@ static void HandleAddTask(TaskManager taskManager)
 		Console.WriteLine($"Error: {ex.Message}");
 	}
 }
-
-static void ShowMenu()
-{
-	foreach (MenuOption option in Enum.GetValues<MenuOption>())
-	{
-		Console.WriteLine($"{(int)option}. {GetLabelForMenuOption(option)}");
-	}
-}
-
-static string GetLabelForMenuOption(MenuOption option) => option switch
-{
-	MenuOption.AddTask => "Add Task",
-	MenuOption.ShowTasks => "Show Tasks",
-	MenuOption.CompleteTask => "Complete Task",
-	MenuOption.Exit => "Exit",
-
-	_ => throw new ArgumentOutOfRangeException(nameof(option), $"Not expected menu option value: {option}"),
-};
 
 static void HandleCompleteTask(TaskManager taskManager)
 {
