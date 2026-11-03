@@ -1,6 +1,6 @@
 ﻿namespace Lexicon.TODO;
 
-public enum TaskStatus
+public enum TaskState
 {
 	Pending,
 	Completed
