@@ -53,12 +53,6 @@ public class TaskManager
 		return UpdateTask(id, state: TaskState.Completed);
 	}
 
-	private bool TryFindIndex(int id, out int index)
-	{
-		index = tasks.FindIndex(t => t.Id == id);
-		return index != -1;
-	}
-
 	public bool DeleteTask(int id)
 	{
 		if (!TryFindIndex(id, out var taskIndex))
@@ -74,4 +68,11 @@ public class TaskManager
 
 	public IReadOnlyList<TaskItem> GetAllTasks() => tasks
 		.AsReadOnly();
+
+
+	private bool TryFindIndex(int id, out int index)
+	{
+		index = tasks.FindIndex(t => t.Id == id);
+		return index != -1;
+	}
 }

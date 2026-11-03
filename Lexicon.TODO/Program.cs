@@ -10,14 +10,20 @@ try
 
 		var choice = InputHelper.ReadInt("Enter your choice: ");
 
-		switch (choice)
+		switch ((MenuOption)choice)
 		{
-			case 1:
+			case MenuOption.AddTask:
 				HandleAddTask(taskManager);
 				break;
-			case 2:
+
+			case MenuOption.ShowTasks:
+				HandleShowTasks(taskManager);
+				break;
+
+			case MenuOption.Exit:
 				Console.WriteLine("Exiting...");
 				return;
+
 			default:
 				Console.WriteLine("Invalid choice. Please try again.");
 				break;
@@ -54,5 +60,24 @@ static void HandleAddTask(TaskManager taskManager)
 static void ShowMenu()
 {
 	Console.WriteLine("1. Add Task");
-	Console.WriteLine("2. Exit");
+	Console.WriteLine("2. Show Tasks");
+	Console.WriteLine("3. Exit");
+}
+
+static void HandleShowTasks(TaskManager taskManager)
+{
+	var tasks = taskManager.GetAllTasks();
+
+	if (tasks.Count == 0)
+	{
+		Console.WriteLine("No tasks available.");
+		return;
+	}
+
+	Console.WriteLine("Current Tasks:");
+
+	foreach (var task in tasks)
+	{
+		Console.WriteLine($"ID: {task.Id}, Title: {task.Title}, Due: {task.DueDate:yyyy-MM-dd}, State: {task.State}, Project: {task.Project}");
+	}
 }
