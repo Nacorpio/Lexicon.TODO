@@ -21,7 +21,11 @@ public class TaskManager
 		return task;
 	}
 
-	public bool UpdateTask(int id, string? title = null, DateTime? dueDate = null, TaskState? state = null, string? project = null)
+	public bool UpdateTask(int id, 
+		string? title = null, 
+		DateTime? dueDate = null, 
+		TaskState? state = null, 
+		string? project = null)
 	{
 		if (title is not null && string.IsNullOrWhiteSpace(title))
 			throw new ArgumentException("Title cannot be empty or whitespace.", nameof(title));
@@ -46,19 +50,7 @@ public class TaskManager
 
 	public bool CompleteTask(int id)
 	{
-		if (!TryFindIndex(id, out var taskIndex))
-			return false;
-
-		var existingTask = tasks[taskIndex];
-
-		if (existingTask.State == TaskState.Completed)
-			return true;
-
-		var updatedTask = existingTask with { State = TaskState.Completed };
-
-		tasks[taskIndex] = updatedTask;
-
-		return true;
+		return UpdateTask(id, state: TaskState.Completed);
 	}
 
 	private bool TryFindIndex(int id, out int index)
