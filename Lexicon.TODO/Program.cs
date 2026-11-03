@@ -20,6 +20,10 @@ try
 				HandleShowTasks(taskManager);
 				break;
 
+			case MenuOption.CompleteTask:
+				HandleCompleteTask(taskManager);
+				break;
+
 			case MenuOption.Exit:
 				Console.WriteLine("Exiting...");
 				return;
@@ -59,7 +63,7 @@ static void HandleAddTask(TaskManager taskManager)
 
 static void ShowMenu()
 {
-	foreach (MenuOption option in Enum.GetValues(typeof(MenuOption)))
+	foreach (MenuOption option in Enum.GetValues<MenuOption>())
 	{
 		Console.WriteLine($"{(int)option}. {GetLabelForMenuOption(option)}");
 	}
@@ -69,10 +73,25 @@ static string GetLabelForMenuOption(MenuOption option) => option switch
 {
 	MenuOption.AddTask => "Add Task",
 	MenuOption.ShowTasks => "Show Tasks",
+	MenuOption.CompleteTask => "Complete Task",
 	MenuOption.Exit => "Exit",
 
 	_ => throw new ArgumentOutOfRangeException(nameof(option), $"Not expected menu option value: {option}"),
 };
+
+static void HandleCompleteTask(TaskManager taskManager)
+{
+	var id = InputHelper.ReadInt("Enter the ID of the task to complete: ");
+
+	if (taskManager.UpdateTask(id, state: TaskState.Completed))
+	{
+		Console.WriteLine($"Task with ID {id} marked as completed.");
+	}
+	else
+	{
+		Console.WriteLine($"No task found with ID {id}.");
+	}
+}
 
 static void HandleShowTasks(TaskManager taskManager)
 {
