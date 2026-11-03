@@ -59,10 +59,20 @@ static void HandleAddTask(TaskManager taskManager)
 
 static void ShowMenu()
 {
-	Console.WriteLine("1. Add Task");
-	Console.WriteLine("2. Show Tasks");
-	Console.WriteLine("3. Exit");
+	foreach (MenuOption option in Enum.GetValues(typeof(MenuOption)))
+	{
+		Console.WriteLine($"{(int)option}. {GetLabelForMenuOption(option)}");
+	}
 }
+
+static string GetLabelForMenuOption(MenuOption option) => option switch
+{
+	MenuOption.AddTask => "Add Task",
+	MenuOption.ShowTasks => "Show Tasks",
+	MenuOption.Exit => "Exit",
+
+	_ => throw new ArgumentOutOfRangeException(nameof(option), $"Not expected menu option value: {option}"),
+};
 
 static void HandleShowTasks(TaskManager taskManager)
 {
