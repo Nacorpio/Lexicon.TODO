@@ -6,8 +6,8 @@ public static class MenuLabels
 	{
 		MainMenuOption.AddTask => "Add Task",
 		MainMenuOption.ShowTasks => "Show Tasks",
-		MainMenuOption.CompleteTask => "Complete Task",
-		MainMenuOption.Exit => "Exit",
+		MainMenuOption.EditTask => "Edit Task",
+		MainMenuOption.SaveAndQuit => "Save and Quit",
 
 		_ => throw new ArgumentOutOfRangeException(nameof(option), option, null)
 	};
