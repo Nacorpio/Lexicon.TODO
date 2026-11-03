@@ -46,6 +46,25 @@ public class TaskManager
 		return true;
 	}
 
+	public bool CompleteTask(int id)
+	{
+		var taskIndex = tasks.FindIndex(t => t.Id == id);
+
+		if (taskIndex == -1)
+			return false;
+
+		var existingTask = tasks[taskIndex];
+
+		if (existingTask.State == TaskState.Completed)
+			return false;
+
+		var updatedTask = existingTask with { State = TaskState.Completed };
+
+		tasks[taskIndex] = updatedTask;
+
+		return true;
+	}
+
 	public bool DeleteTask(int id)
 	{
 		var taskIndex = tasks.FindIndex(t => t.Id == id);
