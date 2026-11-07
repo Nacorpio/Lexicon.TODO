@@ -4,8 +4,20 @@ using System.Text;
 
 namespace Lexicon.TODO;
 
-public static class ConsoleHelper 
+public record ColumnDefinition(string Header, ColumnAlignment Alignment, Func<TaskItem, string> ValueSelector);
+public enum ColumnAlignment { Left, Right }
+
+public static class ConsoleHelper
 {
+	private static readonly IReadOnlyList<ColumnDefinition> DefaultTaskColumns =
+	[
+		new ColumnDefinition("ID", ColumnAlignment.Right, static task => task.Id.ToString()),
+		new ColumnDefinition("Title", ColumnAlignment.Left, static task => task.Title),
+		new ColumnDefinition("Due Date", ColumnAlignment.Left, static task => task.DueDate.ToString("yyyy-MM-dd")),
+		new ColumnDefinition("Project", ColumnAlignment.Left, static task => task.Project ?? string.Empty),
+		new ColumnDefinition("State", ColumnAlignment.Left, static task => task.State.ToString())
+	];
+
 	public static void PrintTasks(IReadOnlyList<TaskItem> tasks)
 	{
 		if (tasks.Count == 0)
@@ -16,14 +28,49 @@ public static class ConsoleHelper
 
 		Console.WriteLine("Tasks:");
 
-		foreach (var task in tasks)
-		{
-			Console.WriteLine($"ID: {task.Id}, Title: {task.Title}, Due: {task.DueDate:yyyy-MM-dd}, State: {task.State}, Project: {task.Project}");
-		}
+		PrintTable(DefaultTaskColumns, tasks, " | ");
 	}
 
-	public static void PrintTask(TaskItem task)
+	public static void PrintRow(string[] columns, int[] widths, string separator, ConsoleColor? color = null)
 	{
-		Console.WriteLine($"ID: {task.Id}, Title: {task.Title}, Due: {task.DueDate:yyyy-MM-dd}, State: {task.State}, Project: {task.Project}");
+		if (columns.Length != widths.Length)
+			throw new ArgumentException("Columns and widths must have the same length.");
+
+		for (var i = 0; i < columns.Length; i++)
+		{
+			if (i > 0)
+				Console.Write(separator);
+
+			Console.Write(columns[i].PadRight(widths[i]), color);
+		}
+
+		Console.WriteLine();
+	}
+
+	public static void PrintTable(
+		IReadOnlyList<ColumnDefinition> columnDefs,
+		IReadOnlyList<TaskItem> tasks,
+		string separator)
+	{
+		if (tasks.Count == 0)
+		{
+			Console.WriteLine("No tasks available.");
+			return;
+		}
+
+		int[] widths = new int[columnDefs.Count];
+
+		for (var i = 0; i < columnDefs.Count; i++)
+		{
+			widths[i] = Math.Max(columnDefs[i].Header.Length,
+				tasks.Max(task => columnDefs[i].ValueSelector(task).Length));
+		}
+
+		PrintRow([.. columnDefs.Select(cd => cd.Header)], widths, separator, ConsoleColor.Cyan);
+
+		foreach (var task in tasks)
+		{
+			PrintRow([.. columnDefs.Select(cd => cd.ValueSelector(task))], widths, separator);
+		}
 	}
 }
