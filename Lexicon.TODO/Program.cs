@@ -2,13 +2,21 @@
 
 var taskManager = new TaskManager();
 
+AddSampleTasks(taskManager);
+
 try 
 {
 	while (true)
 	{
+		Console.Clear();
+
 		MenuHelper.Show<MainMenuOption>(option => option.ToLabel());
 
+		Console.WriteLine();
+
 		var choice = InputHelper.ReadInt("Enter your choice: ");
+
+		Console.Clear();
 
 		switch ((MainMenuOption)choice)
 		{
@@ -21,7 +29,7 @@ try
 				break;
 
 			case MainMenuOption.SortTasks:
-				//HandleSortTasks(taskManager);
+				HandleSortTasks(taskManager);
 				break;
 
 			case MainMenuOption.EditTask:
@@ -36,11 +44,23 @@ try
 				Console.WriteLine("Invalid choice. Please try again.");
 				break;
 		}
+
+		Console.WriteLine();
+		Console.WriteLine("Press Enter to continue...");
+
+		Console.ReadLine();
 	}
 }
 catch (EndOfStreamException)
 {
 	Console.WriteLine("Input ended unexpectedly. Exiting...");
+}
+
+static void AddSampleTasks(TaskManager taskManager)
+{
+	taskManager.AddTask("Finish project report", new DateTime(2024, 6, 15), "Work");
+	taskManager.AddTask("Grocery shopping", new DateTime(2024, 6, 10), "Personal");
+	taskManager.AddTask("Doctor's appointment", new DateTime(2024, 6, 12), "Health");
 }
 
 static void HandleShowTasks(TaskManager taskManager)
@@ -53,7 +73,8 @@ static void HandleShowTasks(TaskManager taskManager)
 		return;
 	}
 
-	Console.WriteLine("Current Tasks:");
+	Console.WriteLine("Tasks");
+	Console.WriteLine();
 
 	foreach (var task in tasks)
 	{
@@ -87,6 +108,8 @@ static void HandleSortTasks(TaskManager taskManager)
 	MenuHelper.Show<SortMenuOption>(option => option.ToLabel());
 
 	var choice = InputHelper.ReadInt("Enter your choice: ");
+
+	Console.Clear();
 
 	switch ((SortMenuOption)choice)
 	{

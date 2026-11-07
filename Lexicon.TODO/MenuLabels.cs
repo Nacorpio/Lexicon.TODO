@@ -6,6 +6,7 @@ public static class MenuLabels
 	{
 		MainMenuOption.ShowTasks => "Show Tasks",
 		MainMenuOption.AddTask => "Add Task",
+		MainMenuOption.SortTasks => "Sort Tasks",
 		MainMenuOption.EditTask => "Edit Task",
 		MainMenuOption.SaveAndQuit => "Save and Quit",
 
