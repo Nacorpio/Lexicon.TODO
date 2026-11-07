@@ -4,8 +4,8 @@ public static class MenuLabels
 {
 	public static string ToLabel(this MainMenuOption option) => option switch
 	{
-		MainMenuOption.AddTask => "Add Task",
 		MainMenuOption.ShowTasks => "Show Tasks",
+		MainMenuOption.AddTask => "Add Task",
 		MainMenuOption.EditTask => "Edit Task",
 		MainMenuOption.SaveAndQuit => "Save and Quit",
 

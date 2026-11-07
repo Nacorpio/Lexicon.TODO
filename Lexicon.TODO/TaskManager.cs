@@ -90,6 +90,17 @@ public class TaskManager
 		.AsReadOnly();
 
 	
+	public IReadOnlyList<TaskItem> GetTasksSortedByDueDate() => tasks
+		.OrderBy(t => t.DueDate)
+		.ToList()
+		.AsReadOnly();
+
+	public IReadOnlyList<TaskItem> GetTasksSortedByProject() => tasks
+		.OrderBy(t => t.Project)
+		.ToList()
+		.AsReadOnly();
+
+
 	private bool TryFindIndex(int id, out int index)
 	{
 		index = tasks.FindIndex(t => t.Id == id);

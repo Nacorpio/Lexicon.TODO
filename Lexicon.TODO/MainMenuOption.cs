@@ -2,8 +2,9 @@
 
 public enum MainMenuOption
 {
-	AddTask = 1,
-	ShowTasks = 2,
-	EditTask = 3,
-	SaveAndQuit = 4
+	ShowTasks = 1,
+	AddTask = 2,
+	SortTasks = 3,
+	EditTask = 4,
+	SaveAndQuit = 5
 }
