@@ -96,6 +96,7 @@ public class TaskManager
 		.AsReadOnly();
 
 	public IReadOnlyList<TaskItem> GetTasksSortedByProject() => tasks
+		.OrderBy(t => t.Project is null)
 		.OrderBy(t => t.Project)
 		.ThenBy(t => t.DueDate)
 		.ToList()
