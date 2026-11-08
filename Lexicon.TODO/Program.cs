@@ -10,9 +10,7 @@ try
 	{
 		Console.Clear();
 
-		MenuHelper.Show<MainMenuOption>(option => option.ToLabel());
-
-		Console.WriteLine();
+		MenuHelper.Show<MainMenuOption>("Main Menu", option => option.ToLabel(), ConsoleColor.Green);
 
 		var choice = InputHelper.ReadInt("Enter your choice: ");
 

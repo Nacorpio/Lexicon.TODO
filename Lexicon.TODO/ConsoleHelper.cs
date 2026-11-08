@@ -18,6 +18,29 @@ public static class ConsoleHelper
 		new ColumnDefinition("State", ColumnAlignment.Left, static task => task.State.ToString())
 	];
 
+	public static void Print(string message, ConsoleColor? color = null)
+	{
+		if (color.HasValue)
+			Console.ForegroundColor = color.Value;
+
+		Console.Write(message);
+		Console.ResetColor();
+	}
+
+	public static void PrintLine(string message, ConsoleColor? color = null)
+	{
+		if (color.HasValue)
+			Console.ForegroundColor = color.Value;
+
+		Console.WriteLine(message);
+		Console.ResetColor();
+	}
+
+	public static void PrintLine()
+	{
+		Console.WriteLine();
+	}
+
 	public static void PrintTasks(IReadOnlyList<TaskItem> tasks)
 	{
 		if (tasks.Count == 0)
@@ -26,7 +49,7 @@ public static class ConsoleHelper
 			return;
 		}
 
-		Console.WriteLine("Tasks:");
+		PrintLine("Tasks:");
 
 		PrintTable(DefaultTaskColumns, tasks, " | ");
 	}
@@ -39,12 +62,12 @@ public static class ConsoleHelper
 		for (var i = 0; i < columns.Length; i++)
 		{
 			if (i > 0)
-				Console.Write(separator);
+				Print(separator);
 
-			Console.Write(columns[i].PadRight(widths[i]), color);
+			Print(columns[i].PadRight(widths[i]), color);
 		}
 
-		Console.WriteLine();
+		PrintLine();
 	}
 
 	public static void PrintTable(
@@ -54,7 +77,7 @@ public static class ConsoleHelper
 	{
 		if (tasks.Count == 0)
 		{
-			Console.WriteLine("No tasks available.");
+			PrintLine("No tasks available.");
 			return;
 		}
 

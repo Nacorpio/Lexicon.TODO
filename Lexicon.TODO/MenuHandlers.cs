@@ -8,7 +8,7 @@ public static class MenuHandlers
 {
 	public static void HandleShowTasks(TaskManager taskManager)
 	{
-		MenuHelper.Show<SortMenuOption>(option => option.ToLabel());
+		MenuHelper.Show<SortMenuOption>("Sort Tasks", option => option.ToLabel());
 
 		var choice = InputHelper.ReadInt("Enter your choice: ");
 
@@ -50,8 +50,6 @@ public static class MenuHandlers
 			Console.WriteLine($"Error: {ex.Message}");
 		}
 	}
-
-	
 
 	public static void HandleCompleteTask(TaskManager taskManager)
 	{
