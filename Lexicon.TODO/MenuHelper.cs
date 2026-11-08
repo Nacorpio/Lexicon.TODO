@@ -15,7 +15,11 @@ public static class MenuHelper
 	/// <param name="description">The description text to display below the header and above the menu options.</param>
 	/// <param name="getLabel">A function that returns the display label for each enum value.</param>
 	/// <param name="headerColor">The color to use for the header text.</param>
-	public static void Show<T>(string header, string? description, Func<T, string> getLabel, ConsoleColor? headerColor = null) where T : struct, Enum
+	public static void ShowMenu<T>(
+		string header, string? description, 
+		Func<T, string> getLabel, 
+		ConsoleColor? headerColor = null) 
+		where T : struct, Enum
 	{
 		var menuItems = Enum.GetValues<T>();
 		var menuItemCount = menuItems.Length;
@@ -53,12 +57,11 @@ public static class MenuHelper
 	{
 		var menuItems = Enum.GetValues<T>();
 		var menuItemCount = menuItems.Length;
+
 		int dividerLength = Math.Max(header.Length, menuItems.Max(option => (Convert.ToInt32(option).ToString().Length + 3 + getLabel(option).Length)));
 
 		if (!string.IsNullOrWhiteSpace(description))
-		{
 			dividerLength = Math.Max(dividerLength, description.Length);
-		}
 
 		return dividerLength;
 	}

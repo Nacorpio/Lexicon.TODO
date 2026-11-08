@@ -45,26 +45,27 @@ public static class ConsoleHelper
 	{
 		if (tasks.Count == 0)
 		{
-			Console.WriteLine("No tasks available.");
+			ConsoleHelper.PrintLine("No tasks available.");
 			return;
 		}
-
-		PrintLine("Tasks:");
 
 		PrintTable(DefaultTaskColumns, tasks, " | ");
 	}
 
-	public static void PrintRow(string[] columns, int[] widths, string separator, ConsoleColor? color = null)
+	public static void PrintRow(string[] columns, int[] widths, ColumnAlignment[] alignments, string separator, ConsoleColor? color = null)
 	{
-		if (columns.Length != widths.Length)
-			throw new ArgumentException("Columns and widths must have the same length.");
+		if (columns.Length != widths.Length || columns.Length != alignments.Length)
+			throw new ArgumentException("Columns, widths, and alignments must have the same length.");
 
 		for (var i = 0; i < columns.Length; i++)
 		{
 			if (i > 0)
 				Print(separator);
 
-			Print(columns[i].PadRight(widths[i]), color);
+			if (alignments[i] == ColumnAlignment.Right)
+				Print(columns[i].PadLeft(widths[i]), color);
+			else
+				Print(columns[i].PadRight(widths[i]), color);
 		}
 
 		PrintLine();
@@ -75,25 +76,22 @@ public static class ConsoleHelper
 		IReadOnlyList<TaskItem> tasks,
 		string separator)
 	{
-		if (tasks.Count == 0)
-		{
-			PrintLine("No tasks available.");
-			return;
-		}
-
 		int[] widths = new int[columnDefs.Count];
+		ColumnAlignment[] alignments = new ColumnAlignment[columnDefs.Count];
 
 		for (var i = 0; i < columnDefs.Count; i++)
 		{
 			widths[i] = Math.Max(columnDefs[i].Header.Length,
 				tasks.Max(task => columnDefs[i].ValueSelector(task).Length));
+
+			alignments[i] = columnDefs[i].Alignment;
 		}
 
-		PrintRow([.. columnDefs.Select(cd => cd.Header)], widths, separator, ConsoleColor.Cyan);
+		PrintRow([.. columnDefs.Select(cd => cd.Header)], widths, alignments, separator, ConsoleColor.Cyan);
 
 		foreach (var task in tasks)
 		{
-			PrintRow([.. columnDefs.Select(cd => cd.ValueSelector(task))], widths, separator);
+			PrintRow([.. columnDefs.Select(cd => cd.ValueSelector(task))], widths, alignments, separator);
 		}
 	}
 }
