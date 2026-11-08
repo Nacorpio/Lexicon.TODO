@@ -8,7 +8,7 @@ public static class MenuHandlers
 {
 	public static void HandleShowTasks(TaskManager taskManager)
 	{
-		MenuHelper.Show<SortMenuOption>("Sort Tasks", option => option.ToLabel());
+		MenuHelper.Show<SortMenuOption>("Sort Tasks", $"Choose how to sort the tasks", option => option.ToLabel());
 
 		var choice = InputHelper.ReadInt("Enter your choice: ");
 

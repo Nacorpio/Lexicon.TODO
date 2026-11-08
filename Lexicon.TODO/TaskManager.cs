@@ -15,6 +15,22 @@ public class TaskManager
 	public int NextId => tasks.Count > 0 ? tasks.Max(t => t.Id) + 1 : 1;
 
 
+	public IReadOnlyList<TaskItem> CompletedTasks => tasks
+		.Where(t => t.State == TaskState.Completed)
+		.ToList()
+		.AsReadOnly();
+
+	public IReadOnlyList<TaskItem> PendingTasks => tasks
+		.Where(t => t.State == TaskState.Pending)
+		.ToList()
+		.AsReadOnly();
+
+	public IReadOnlyList<TaskItem> OverdueTasks => tasks
+		.Where(t => t.State == TaskState.Pending && t.DueDate < DateTime.Today)
+		.ToList()
+		.AsReadOnly();
+
+
 	/// <summary>Adds a pending task with the next Id. The title is trimmed.</summary>
 	/// <exception cref="ArgumentException"><paramref name="title"/> is null, empty or whitespace.</exception>
 	public TaskItem AddTask(string title, DateTime dueDate, string? project = null)
@@ -84,6 +100,7 @@ public class TaskManager
 
 	public TaskItem? FindById(int id) => tasks
 		.FirstOrDefault(t => t.Id == id);
+
 
 	/// <summary>Returns a read-only view of the live list, not a copy.</summary>
 	public IReadOnlyList<TaskItem> GetAllTasks() => tasks

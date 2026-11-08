@@ -12,17 +12,25 @@ public static class MenuHelper
 	/// <remarks>Output format: `{number}. {label}`.</remarks>
 	/// <typeparam name="T">The enum type whose values are displayed.</typeparam>
 	/// <param name="header">The header text to display above the menu options.</param>
+	/// <param name="description">The description text to display below the header and above the menu options.</param>
 	/// <param name="getLabel">A function that returns the display label for each enum value.</param>
 	/// <param name="headerColor">The color to use for the header text.</param>
-	public static void Show<T>(string header, Func<T, string> getLabel, ConsoleColor? headerColor = null) where T : struct, Enum
+	public static void Show<T>(string header, string? description, Func<T, string> getLabel, ConsoleColor? headerColor = null) where T : struct, Enum
 	{
 		var menuItems = Enum.GetValues<T>();
 		var menuItemCount = menuItems.Length;
 
-		int dividerLength = CalculateDividerLength(header, getLabel);
+		int dividerLength = CalculateDividerLength(header, description, getLabel);
 		var divider = new string('-', dividerLength);
 
 		ConsoleHelper.PrintLine(header.ToUpperInvariant(), headerColor);
+
+		if (!string.IsNullOrWhiteSpace(description))
+		{
+			ConsoleHelper.PrintLine(divider);
+			ConsoleHelper.PrintLine(description, ConsoleColor.DarkGray);
+		}
+
 		ConsoleHelper.PrintLine(divider);
 
 		foreach (var option in menuItems)
@@ -38,13 +46,19 @@ public static class MenuHelper
 	/// label length.</remarks>
 	/// <typeparam name="T">The enum type used to generate menu items.</typeparam>
 	/// <param name="header">The header text to include in the width calculation.</param>
+	/// <param name="description">The description text to include in the width calculation.</param>
 	/// <param name="getLabel">A delegate that returns the display label for an enum value.</param>
 	/// <returns>The greater of the header length and the maximum formatted menu item length.</returns>
-	private static int CalculateDividerLength<T>(string header, Func<T, string> getLabel) where T : struct, Enum
+	private static int CalculateDividerLength<T>(string header, string? description, Func<T, string> getLabel) where T : struct, Enum
 	{
 		var menuItems = Enum.GetValues<T>();
 		var menuItemCount = menuItems.Length;
 		int dividerLength = Math.Max(header.Length, menuItems.Max(option => (Convert.ToInt32(option).ToString().Length + 3 + getLabel(option).Length)));
+
+		if (!string.IsNullOrWhiteSpace(description))
+		{
+			dividerLength = Math.Max(dividerLength, description.Length);
+		}
 
 		return dividerLength;
 	}

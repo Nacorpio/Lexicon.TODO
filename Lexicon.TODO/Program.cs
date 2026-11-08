@@ -10,7 +10,7 @@ try
 	{
 		Console.Clear();
 
-		MenuHelper.Show<MainMenuOption>("Main Menu", option => option.ToLabel(), ConsoleColor.Green);
+		MenuHelper.Show<MainMenuOption>("Main Menu", $"Welcome to the Task Manager!", option => option.ToLabel(), ConsoleColor.Green);
 
 		var choice = InputHelper.ReadInt("Enter your choice: ");
 
