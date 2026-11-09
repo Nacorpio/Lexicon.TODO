@@ -1,4 +1,6 @@
-﻿namespace Lexicon.TODO;
+﻿using Lexicon.TODO.Models;
+
+namespace Lexicon.TODO.Services;
 
 /// <summary>
 /// Manages a collection of tasks, providing functionality to add, update, delete, and query tasks.

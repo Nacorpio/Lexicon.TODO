@@ -1,4 +1,6 @@
-﻿namespace Lexicon.TODO;
+﻿using Lexicon.TODO.Models;
+
+namespace Lexicon.TODO;
 
 public static class MenuLabels
 {

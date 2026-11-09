@@ -1,4 +1,6 @@
-﻿namespace Lexicon.TODO.Helpers;
+﻿using Lexicon.TODO.Models;
+
+namespace Lexicon.TODO.Helpers;
 
 public static partial class ConsoleHelper
 {

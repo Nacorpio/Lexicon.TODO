@@ -1,7 +1,17 @@
 ﻿using Lexicon.TODO.Helpers;
+using Lexicon.TODO.Models;
+using Lexicon.TODO.Services;
 
 namespace Lexicon.TODO;
 
+/// <summary>
+/// Provides static methods for handling various menu-related operations in the TO-DO application.
+/// </summary>
+/// <remarks>
+/// This class includes methods for managing tasks, such as displaying, adding, editing, deleting, 
+/// and completing tasks. It interacts with the <see cref="TaskManager"/> to perform these operations 
+/// and provides user-friendly menus for task management.
+/// </remarks>
 public static class MenuHandlers
 {
 	/// <summary>
@@ -64,7 +74,7 @@ public static class MenuHandlers
 		var dueDate = InputHelper.ReadDateTime ( "Enter due date (yyyy-MM-dd): " );
 		var project = InputHelper.ReadOptionalString ( "Enter project name (optional): " );
 
-		var task = taskManager.AddTask ( title, dueDate,
+		TaskItem task = taskManager.AddTask ( title, dueDate,
 			string.IsNullOrWhiteSpace ( project )
 				? null
 				: project );
@@ -154,10 +164,14 @@ public static class MenuHandlers
 	/// </remarks>
 	private static void HandleUpdateTask ( TaskManager taskManager, int id )
 	{
-		var newTitle = InputHelper.ReadOptionalString ( "Enter new title (leave blank to keep current): " );
+		var newTitle = InputHelper
+			.ReadOptionalString ( "Enter new title (leave blank to keep current): " );
+		
 		var newDueDateInput =
 			InputHelper.ReadDateTime ( "Enter new due date (yyyy-MM-dd) (leave blank to keep current): " );
-		var newProject = InputHelper.ReadOptionalString ( "Enter new project name (leave blank to keep current): " );
+		
+		var newProject = InputHelper
+			.ReadOptionalString ( "Enter new project name (leave blank to keep current): " );
 
 		Console.WriteLine ( taskManager.UpdateTask ( id,
 			title: string.IsNullOrWhiteSpace ( newTitle )

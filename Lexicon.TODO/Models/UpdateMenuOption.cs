@@ -1,4 +1,4 @@
-﻿namespace Lexicon.TODO;
+﻿namespace Lexicon.TODO.Models;
 
 /// <summary>
 /// Represents the available options for updating a task in the menu.

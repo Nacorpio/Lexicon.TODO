@@ -1,4 +1,4 @@
-﻿namespace Lexicon.TODO;
+﻿namespace Lexicon.TODO.Models;
 
 /// <summary>
 /// Represents the state of a task.

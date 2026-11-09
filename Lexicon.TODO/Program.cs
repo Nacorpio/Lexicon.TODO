@@ -1,5 +1,7 @@
 ﻿using Lexicon.TODO;
 using Lexicon.TODO.Helpers;
+using Lexicon.TODO.Models;
+using Lexicon.TODO.Services;
 
 var taskManager = new TaskManager ();
 

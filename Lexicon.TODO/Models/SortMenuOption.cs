@@ -1,4 +1,4 @@
-﻿namespace Lexicon.TODO;
+﻿namespace Lexicon.TODO.Models;
 
 public enum SortMenuOption 
 {

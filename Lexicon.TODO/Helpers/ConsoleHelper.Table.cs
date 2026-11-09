@@ -1,4 +1,6 @@
-﻿namespace Lexicon.TODO.Helpers;
+﻿using Lexicon.TODO.Models;
+
+namespace Lexicon.TODO.Helpers;
 
 /// <summary>
 /// Defines a column in a tabular display of task information.
