@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lexicon.TODO;
+namespace Lexicon.TODO.Helpers;
 
 public static class MenuHelper
 {

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lexicon.TODO;
+namespace Lexicon.TODO.Helpers;
 
 public record ColumnDefinition(string Header, ColumnAlignment Alignment, Func<TaskItem, string> ValueSelector);
-public record ColumnSnapshot(string Header, int Width, ColumnAlignment Alignment, string );
 
 public enum ColumnAlignment { Left, Right }
 
@@ -53,25 +52,4 @@ public static partial class ConsoleHelper
 
 		PrintTable(DefaultTaskColumns, tasks, " | ");
 	}
-
-	public static void PrintRow(string[] columns, int[] widths, ColumnAlignment[] alignments, string separator, ConsoleColor? color = null)
-	{
-		if (columns.Length != widths.Length || columns.Length != alignments.Length)
-			throw new ArgumentException("Columns, widths, and alignments must have the same length.");
-
-		for (var i = 0; i < columns.Length; i++)
-		{
-			if (i > 0)
-				Print(separator);
-
-			if (alignments[i] == ColumnAlignment.Right)
-				Print(columns[i].PadLeft(widths[i]), color);
-			else
-				Print(columns[i].PadRight(widths[i]), color);
-		}
-
-		PrintLine();
-	}
-
-	
 }

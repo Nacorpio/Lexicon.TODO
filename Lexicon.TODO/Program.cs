@@ -1,4 +1,5 @@
 ﻿using Lexicon.TODO;
+using Lexicon.TODO.Helpers;
 
 var taskManager = new TaskManager();
 
@@ -30,7 +31,7 @@ try
 				break;
 
 			case MainMenuOption.EditTask:
-				//HandleEditTask(taskManager);
+				MenuHandlers.HandleEditTask(taskManager);
 				break;
 
 			case MainMenuOption.SaveAndQuit:

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Lexicon.TODO.Helpers;
 
 namespace Lexicon.TODO;
 
@@ -8,7 +9,10 @@ public static class MenuHandlers
 {
 	public static void HandleShowTasks(TaskManager taskManager)
 	{
-		MenuHelper.ShowMenu<SortMenuOption>("Sort Tasks", $"Choose how to sort the tasks", option => option.ToLabel());
+		MenuHelper.ShowMenu<SortMenuOption>(
+			header: "Sort Tasks",
+			description: $"Choose how to sort the tasks",
+			getLabel: option => option.ToLabel());
 
 		var choice = InputHelper.ReadInt("Enter your choice: ");
 
@@ -35,20 +39,13 @@ public static class MenuHandlers
 		var title = InputHelper.ReadNonEmptyString("Enter task title: ");
 		var dueDate = InputHelper.ReadDateTime("Enter due date (yyyy-MM-dd): ");
 		var project = InputHelper.ReadOptionalString("Enter project name (optional): ");
+	
+		var task = taskManager.AddTask(title, dueDate,
+			string.IsNullOrWhiteSpace(project)
+				? null
+				: project);
 
-		try
-		{
-			var task = taskManager.AddTask(title!, dueDate,
-				string.IsNullOrWhiteSpace(project)
-					? null
-					: project);
-
-			Console.WriteLine($"Task added with ID: {task.Id}");
-		}
-		catch (ArgumentNullException ex)
-		{
-			Console.WriteLine($"Error: {ex.Message}");
-		}
+		Console.WriteLine($"Task added with ID: {task.Id}");
 	}
 
 	public static void HandleEditTask(TaskManager taskManager)
@@ -62,13 +59,20 @@ public static class MenuHandlers
 			return;
 		}
 
+		Console.Clear();
+
 		ConsoleHelper.PrintLine();
 		ConsoleHelper.PrintTasks([task]);
 		ConsoleHelper.PrintLine();
 
-		MenuHelper.ShowMenu<EditMenuOption>("Edit Task", $"Choose what to edit for task ID {id}", option => option.ToLabel());
+		MenuHelper.ShowMenu<EditMenuOption>(
+			header: "Edit Task",
+			description: $"Choose what to edit for task ID {id}",
+			getLabel: option => option.ToLabel());
 
 		var choice = InputHelper.ReadInt("Enter your choice: ");
+
+		Console.Clear();
 
 		switch ((EditMenuOption)choice)
 		{
@@ -84,32 +88,13 @@ public static class MenuHandlers
 
 			case EditMenuOption.Delete:
 			{
-				if (taskManager.DeleteTask(id))
-					Console.WriteLine($"Task with ID {id} deleted.");
-				else
-					Console.WriteLine($"No task found with ID {id}.");
-					
+				HandleDeleteTask(taskManager);
 				break;
 			}
 			
 			case EditMenuOption.Update:
 			{
-				var newTitle = InputHelper.ReadOptionalString("Enter new title (leave blank to keep current): ");
-				var newDueDateInput = InputHelper.ReadDateTime("Enter new due date (yyyy-MM-dd) (leave blank to keep current): ");
-				var newProject = InputHelper.ReadOptionalString("Enter new project name (leave blank to keep current): ");
-
-				if (taskManager.UpdateTask(id,
-					title: string.IsNullOrWhiteSpace(newTitle) ? null : newTitle,
-					dueDate: newDueDateInput == default ? null : newDueDateInput,
-					project: string.IsNullOrWhiteSpace(newProject) ? null : newProject))
-				{
-					Console.WriteLine($"Task with ID {id} updated.");
-				}
-				else
-				{
-					Console.WriteLine($"No task found with ID {id}.");
-				}
-
+				HandleUpdateTask(taskManager, id);
 				break;
 			}
 
@@ -120,6 +105,27 @@ public static class MenuHandlers
 				break;
 
 		}
+	}
+
+	private static void HandleUpdateTask(TaskManager taskManager, int id)
+	{
+		var newTitle = InputHelper.ReadOptionalString("Enter new title (leave blank to keep current): ");
+		var newDueDateInput = InputHelper.ReadDateTime("Enter new due date (yyyy-MM-dd) (leave blank to keep current): ");
+		var newProject = InputHelper.ReadOptionalString("Enter new project name (leave blank to keep current): ");
+
+		if (taskManager.UpdateTask(id,
+			title: string.IsNullOrWhiteSpace(newTitle) ? null : newTitle,
+			dueDate: newDueDateInput == DateTime.MaxValue ? null : newDueDateInput,
+			project: string.IsNullOrWhiteSpace(newProject) ? null : newProject))
+		{
+			Console.WriteLine($"Task with ID {id} updated.");
+		}
+		else
+		{
+			Console.WriteLine($"No task found with ID {id}.");
+		}
+
+		return;
 	}
 
 	public static void HandleDeleteTask(TaskManager taskManager)

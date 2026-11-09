@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Lexicon.TODO;
+namespace Lexicon.TODO.Helpers;
 
 public static class InputHelper 
 {
@@ -72,6 +72,9 @@ public static class InputHelper
 			Console.Write(prompt);
 
 			var input = ReadLineOrThrow();
+
+			if (string.IsNullOrWhiteSpace(input))
+				return DateTime.MaxValue;
 
 			if (DateTime.TryParseExact(input, "yyyy-MM-dd", 
 				CultureInfo.InvariantCulture, 
