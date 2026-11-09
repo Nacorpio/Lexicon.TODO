@@ -6,27 +6,32 @@ namespace Lexicon.TODO.Services;
 /// Manages a collection of tasks, providing functionality to add, update, delete, and query tasks.
 /// </summary>
 /// <remarks>
-/// This class maintains an in-memory list of tasks and enforces rules for managing them. 
-/// Task IDs are automatically generated based on the highest current ID, allowing reuse of IDs after deletion.
-/// Methods return <see langword="false"/> or <see langword="null"/> for invalid operations, instead of throwing exceptions.
+/// This class maintains an in-memory list of tasks and enforces rules for managing them.
+/// Lookups for a missing ID return <see langword="false"/> or <see langword="null"/>; invalid arguments
+/// (such as an empty title) throw <see cref="ArgumentException"/>.
 /// </remarks>
 public class TaskManager
 {
 	private readonly List<TaskItem> tasks = [];
 
 	/// <summary>
-	/// Gets the next available task ID.
+	/// Allocates a unique identifier for the next task to be added to the task list.
 	/// </summary>
-	/// <value>
-	/// The next ID is calculated as one greater than the highest current task ID. 
-	/// If no tasks exist, the value is <c>1</c>.
-	/// </value>
+	/// <returns>
+	/// A unique integer identifier for the new task.
+	/// </returns>
 	/// <remarks>
-	/// This property ensures that task IDs are unique and sequential, even if tasks are deleted.
+	/// The ID allocation policy ensures that each task has a unique identifier.
+	/// Currently, the ID is determined as the maximum existing task ID incremented by 1, 
+	/// or 1 if the task list is empty. This approach may allow ID reuse if the highest-ID 
+	/// task is deleted. Consider using a monotonic counter to prevent ID reuse.
 	/// </remarks>
-	public int NextId => tasks.Count > 0
-		? tasks.Max ( t => t.Id ) + 1
-		: 1;
+	private int AllocateId ()
+	{
+		return tasks.Any ()
+			? tasks.Max ( t => t.Id ) + 1
+			: 1;
+	}
 
 
 	/// <summary>
@@ -40,9 +45,19 @@ public class TaskManager
 	/// The returned list is immutable and reflects the state of completed tasks at the time of access.
 	/// </remarks>
 	public IReadOnlyList<TaskItem> CompletedTasks => tasks
-		.Where ( t => t.State == TaskState.Completed )
+		.Where ( t => t.IsCompleted )
 		.ToList ()
 		.AsReadOnly ();
+
+	/// <summary>
+	/// Gets the number of completed tasks without materializing a list.
+	/// </summary>
+	public int CompletedCount => tasks.Count ( t => t.IsCompleted );
+
+	/// <summary>
+	/// Gets the number of pending tasks without materializing a list.
+	/// </summary>
+	public int PendingCount => tasks.Count ( t => t.IsPending );
 
 	/// <summary>
 	/// Gets a read-only list of tasks that are currently pending.
@@ -56,7 +71,7 @@ public class TaskManager
 	/// A read-only list of <see cref="TaskItem"/> instances representing the pending tasks.
 	/// </value>
 	public IReadOnlyList<TaskItem> PendingTasks => tasks
-		.Where ( t => t.State == TaskState.Pending )
+		.Where ( t => t.IsPending )
 		.ToList ()
 		.AsReadOnly ();
 
@@ -71,7 +86,7 @@ public class TaskManager
 	/// A read-only list of <see cref="TaskItem"/> instances representing overdue tasks.
 	/// </value>
 	public IReadOnlyList<TaskItem> OverdueTasks => tasks
-		.Where ( t => t.State == TaskState.Pending && t.DueDate < DateTime.Today )
+		.Where ( t => t is { IsPending: true, IsOverdue: true } )
 		.ToList ()
 		.AsReadOnly ();
 
@@ -86,7 +101,8 @@ public class TaskManager
 	/// The due date of the task.
 	/// </param>
 	/// <param name="project">
-	/// The optional project name associated with the task. Can be <see langword="null"/>.
+	/// The optional project name associated with the task. This value is trimmed; <see langword="null"/>,
+	/// empty, or whitespace-only values are stored as <see langword="null"/>.
 	/// </param>
 	/// <returns>
 	/// The newly created <see cref="TaskItem"/> instance representing the added task.
@@ -99,10 +115,11 @@ public class TaskManager
 		ArgumentException.ThrowIfNullOrWhiteSpace ( title, nameof(title) );
 
 		var task = new TaskItem (
-			Id: NextId,
+			Id: AllocateId (),
 			Title: title.Trim (),
 			DueDate: dueDate,
-			State: TaskState.Pending, Project: project );
+			State: TaskState.Pending,
+			Project: NormalizeProject ( project ) );
 
 		tasks.Add ( task );
 
@@ -111,7 +128,7 @@ public class TaskManager
 
 	/// <summary>
 	/// Changes the given fields of a task. A <see langword="null"/> argument keeps the current value,
-	/// so a project cannot be cleared through this method.
+	/// so a project cannot be cleared through this method. Supplied strings are trimmed.
 	/// </summary>
 	/// <returns><see langword="false"/> if no task has this <paramref name="id"/>.</returns>
 	/// <exception cref="ArgumentException"><paramref name="title"/> is supplied but empty or whitespace.</exception>
@@ -135,13 +152,21 @@ public class TaskManager
 			Title = title?.Trim () ?? existingTask.Title,
 			DueDate = dueDate ?? existingTask.DueDate,
 			State = state ?? existingTask.State,
-			Project = project ?? existingTask.Project
+			Project = NormalizeProject ( project ) ?? existingTask.Project
 		};
 
 		tasks[taskIndex] = updatedTask;
 
 		return true;
 	}
+
+	/// <summary>
+	/// Trims a project name and maps empty or whitespace-only values to <see langword="null"/>.
+	/// </summary>
+	private static string? NormalizeProject ( string? project ) =>
+		string.IsNullOrWhiteSpace ( project )
+			? null
+			: project.Trim ();
 
 	/// <summary>
 	/// Determines whether a task with the specified ID exists in the task collection.
@@ -181,7 +206,7 @@ public class TaskManager
 	/// </returns>
 	/// <remarks>
 	/// This method removes the task from the internal collection if it exists. 
-	/// Task IDs are not reused after deletion.
+	/// Because IDs are allocated as max + 1, deleting the highest-ID task lets the next added task reuse its ID.
 	/// </remarks>
 	public bool DeleteTask ( int id )
 	{

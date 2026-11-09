@@ -55,7 +55,7 @@ public static partial class ConsoleHelper
 		var dividerLength = widths.Sum () + (separator.Length * (widths.Length - 1));
 
 		PrintHeader ( columnDefs, widths, alignments, separator );
-		PrintDivider ( dividerLength, separator );
+		PrintDivider ( dividerLength );
 		PrintTaskRows ( rows, widths, alignments, separator );
 	}
 

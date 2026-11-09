@@ -40,9 +40,9 @@ public static class InputHelper
 		{
 			Console.Write ( prompt );
 
-			var input = ReadLineOrThrow ();
+			var input = ReadLineOrThrow ().Trim ();
 
-			if ( !string.IsNullOrWhiteSpace ( input ) )
+			if ( input.Length > 0 )
 				return input;
 
 			Console.WriteLine ( "Input cannot be empty. Please try again." );
@@ -102,11 +102,22 @@ public static class InputHelper
 	{
 		Console.Write ( prompt );
 
-		var input = ReadLineOrThrow ();
+		var input = ReadLineOrThrow ().Trim ();
 
-		return string.IsNullOrWhiteSpace ( input )
+		return input.Length == 0
 			? null
 			: input;
+	}
+
+	/// <summary>
+	/// Displays a prompt and waits for the user to press Enter.
+	/// </summary>
+	/// <param name="prompt">The message to display to the user.</param>
+	/// <exception cref="EndOfStreamException">Thrown if the input stream ends unexpectedly.</exception>
+	public static void WaitForEnter ( string prompt )
+	{
+		Console.WriteLine ( prompt );
+		ReadLineOrThrow ();
 	}
 
 	/// <summary>
@@ -116,7 +127,9 @@ public static class InputHelper
 	/// <returns>The integer value entered by the user.</returns>
 	/// <remarks>
 	/// If the user enters an invalid integer, they will be prompted to try again until a valid integer is provided.
+	/// Parsing is culture-invariant.
 	/// </remarks>
+	/// <exception cref="EndOfStreamException">Thrown if the input stream ends unexpectedly.</exception>
 	public static int ReadInt ( string prompt )
 	{
 		while (true)
@@ -125,7 +138,7 @@ public static class InputHelper
 
 			var input = ReadLineOrThrow ();
 
-			if ( int.TryParse ( input, out var result ) )
+			if ( int.TryParse ( input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result ) )
 				return result;
 
 			Console.WriteLine ( "Invalid integer. Please try again." );
@@ -133,28 +146,29 @@ public static class InputHelper
 	}
 
 	/// <summary>
-	/// Reads a <see cref="DateTime"/> value from the console input, prompting the user with the specified message.
+	/// Reads an optional <see cref="DateTime"/> value from the console input, prompting the user with the specified message.
 	/// </summary>
 	/// <param name="prompt">The message displayed to the user to request input.</param>
 	/// <returns>
-	/// A <see cref="DateTime"/> value parsed from the user's input if valid, or <see cref="DateTime.MaxValue"/> 
+	/// A <see cref="DateTime"/> value parsed from the user's input if valid, or <see langword="null"/>
 	/// if the input is empty or whitespace.
 	/// </returns>
 	/// <remarks>
 	/// The method expects the input to be in the format "yyyy-MM-dd". If the input is invalid, the user will be
-	/// prompted to try again until a valid date is provided.
+	/// prompted to try again until a valid date is provided or the input is left blank.
+	/// Use <see cref="ReadRequiredDateTime"/> when a blank input is not acceptable.
 	/// </remarks>
 	/// <exception cref="EndOfStreamException">Thrown if the input stream ends unexpectedly.</exception>
-	public static DateTime ReadDateTime ( string prompt )
+	public static DateTime? ReadDateTime ( string prompt )
 	{
 		while (true)
 		{
 			Console.Write ( prompt );
 
-			var input = ReadLineOrThrow ();
+			var input = ReadLineOrThrow ().Trim ();
 
-			if ( string.IsNullOrWhiteSpace ( input ) )
-				return DateTime.MaxValue;
+			if ( input.Length == 0 )
+				return null;
 
 			if ( DateTime.TryParseExact ( input, "yyyy-MM-dd",
 				    CultureInfo.InvariantCulture,
@@ -163,6 +177,29 @@ public static class InputHelper
 				return result;
 
 			Console.WriteLine ( "Invalid date format. Please try again." );
+		}
+	}
+
+	/// <summary>
+	/// Reads a required <see cref="DateTime"/> value from the console input, prompting the user with the specified message.
+	/// </summary>
+	/// <param name="prompt">The message displayed to the user to request input.</param>
+	/// <returns>A <see cref="DateTime"/> value parsed from the user's input.</returns>
+	/// <remarks>
+	/// The method expects the input to be in the format "yyyy-MM-dd". Blank or invalid input causes the user
+	/// to be prompted again until a valid date is provided.
+	/// </remarks>
+	/// <exception cref="EndOfStreamException">Thrown if the input stream ends unexpectedly.</exception>
+	public static DateTime ReadRequiredDateTime ( string prompt )
+	{
+		while (true)
+		{
+			var result = ReadDateTime ( prompt );
+
+			if ( result.HasValue )
+				return result.Value;
+
+			Console.WriteLine ( "A date is required. Please try again." );
 		}
 	}
 }

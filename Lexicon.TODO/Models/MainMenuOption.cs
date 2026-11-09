@@ -6,5 +6,5 @@ public enum MainMenuOption
 	AddTask = 2,
 	EditTask = 3,
 
-	SaveAndQuit = 4
+	Quit = 4
 }

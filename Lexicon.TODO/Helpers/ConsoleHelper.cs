@@ -1,9 +1,23 @@
-﻿using Lexicon.TODO.Models;
+﻿using System.Globalization;
+using Lexicon.TODO.Models;
 
 namespace Lexicon.TODO.Helpers;
 
 public static partial class ConsoleHelper
 {
+	/// <summary>
+	/// Clears the console when output is attached to a terminal.
+	/// </summary>
+	/// <remarks>
+	/// <see cref="Console.Clear"/> throws <see cref="IOException"/> when standard output is redirected
+	/// (for example, piped to a file), so this method is a no-op in that case.
+	/// </remarks>
+	public static void Clear ()
+	{
+		if ( !Console.IsOutputRedirected )
+			Console.Clear ();
+	}
+
 	/// <summary>
 	/// Defines the default columns used for displaying task information in a table format.
 	/// </summary>
@@ -19,9 +33,9 @@ public static partial class ConsoleHelper
 	/// </remarks>
 	private static readonly IReadOnlyList<ColumnDefinition> DefaultTaskColumns =
 	[
-		new ( "ID", ColumnAlignment.Right, static task => task.Id.ToString () ),
+		new ( "ID", ColumnAlignment.Right, static task => task.Id.ToString ( CultureInfo.InvariantCulture ) ),
 		new ( "Title", ColumnAlignment.Left, static task => task.Title ),
-		new ( "Due Date", ColumnAlignment.Left, static task => task.DueDate.ToString ( "yyyy-MM-dd" ) ),
+		new ( "Due Date", ColumnAlignment.Left, static task => task.DueDate.ToString ( "yyyy-MM-dd", CultureInfo.InvariantCulture ) ),
 		new ( "Project", ColumnAlignment.Left, static task => task.Project ?? string.Empty ),
 		new ( "State", ColumnAlignment.Left, static task => task.State.ToString () )
 	];
@@ -102,7 +116,7 @@ public static partial class ConsoleHelper
 	/// Prints a divider line to the console using a specified character and length, optionally with a specified color.
 	/// </summary>
 	/// <param name="length">The length of the divider line. Must be a non-negative value.</param>
-	/// <param name="separator">The string used to create the divider line. If not specified, '-' is used.</param>
+	/// <param name="separator">The character repeated to form the divider line. Defaults to '-'.</param>
 	/// <param name="color">
 	/// An optional <see cref="ConsoleColor"/> to use for the divider line text.
 	/// If not specified, the default console color is used.
@@ -113,15 +127,13 @@ public static partial class ConsoleHelper
 	/// <remarks>
 	/// This method is useful for visually separating sections of console output.
 	/// </remarks>
-	public static void PrintDivider ( int length, 
-		string? separator = null, 
+	public static void PrintDivider ( int length,
+		char separator = '-',
 		ConsoleColor? color = null )
 	{
 		ArgumentOutOfRangeException.ThrowIfNegative ( length );
-		
-		var divider = string.Concat ( Enumerable.Repeat ( separator ?? "-", length ) );
-		
-		PrintLine ( divider, color );
+
+		PrintLine ( new string ( separator, length ), color );
 	}
 
 	/// <summary>

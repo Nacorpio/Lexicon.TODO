@@ -34,7 +34,7 @@ public static class MenuHandlers
 
 		var choice = InputHelper.ReadInt ( "Enter your choice: " );
 
-		Console.Clear ();
+		ConsoleHelper.Clear ();
 
 		switch ((SortMenuOption) choice)
 		{
@@ -71,7 +71,7 @@ public static class MenuHandlers
 	public static void HandleAddTask ( TaskManager taskManager )
 	{
 		var title = InputHelper.ReadNonEmptyString ( "Enter task title: " );
-		var dueDate = InputHelper.ReadDateTime ( "Enter due date (yyyy-MM-dd): " );
+		var dueDate = InputHelper.ReadRequiredDateTime ( "Enter due date (yyyy-MM-dd): " );
 		var project = InputHelper.ReadOptionalString ( "Enter project name (optional): " );
 
 		TaskItem task = taskManager.AddTask ( title, dueDate,
@@ -103,7 +103,7 @@ public static class MenuHandlers
 			return;
 		}
 
-		Console.Clear ();
+		ConsoleHelper.Clear ();
 
 		ConsoleHelper.PrintLine ();
 		ConsoleHelper.PrintTasks ( [task] );
@@ -116,16 +116,13 @@ public static class MenuHandlers
 
 		var choice = InputHelper.ReadInt ( "Enter your choice: " );
 
-		Console.Clear ();
+		ConsoleHelper.Clear ();
 
 		switch ((EditMenuOption) choice)
 		{
 			case EditMenuOption.MarkAsCompleted:
 			{
-				Console.WriteLine ( taskManager.CompleteTask ( id )
-					? $"Task with ID {id} marked as completed."
-					: $"No task found with ID {id}." );
-
+				HandleCompleteTask ( taskManager, id );
 				break;
 			}
 
@@ -150,43 +147,66 @@ public static class MenuHandlers
 	}
 
 	/// <summary>
-	/// Updates the details of an existing task identified by its ID.
+	/// Updates the details of a specific task identified by its ID.
 	/// </summary>
 	/// <param name="taskManager">
-	/// An instance of <see cref="TaskManager"/> used to manage tasks.
+	/// An instance of <see cref="TaskManager"/> used to manage and update tasks.
 	/// </param>
 	/// <param name="id">
 	/// The unique identifier of the task to be updated.
 	/// </param>
 	/// <remarks>
-	/// This method allows updating the title, due date, and project of a task. 
-	/// If a field is left blank during input, the current value of that field is retained.
+	/// This method provides a menu-driven interface for updating specific attributes of a task,
+	/// such as its title, due date, or associated project. It uses the <see cref="MenuHelper.ShowMenu{TEnum}"/>
+	/// method to display options and the <see cref="InputHelper"/> methods to collect user input.
+	/// Leaving the due date blank keeps the current value and reports that no change was made.
+	/// An invalid menu option prints an error message; nothing is thrown.
 	/// </remarks>
 	private static void HandleUpdateTask ( TaskManager taskManager, int id )
 	{
-		var newTitle = InputHelper
-			.ReadOptionalString ( "Enter new title (leave blank to keep current): " );
+		MenuHelper.ShowMenu<UpdateMenuOption> (
+			header: "Update Task",
+			description: $"Choose what to update for task ID {id}",
+			getLabel: option => option.ToLabel () );
 
-		var newDueDateInput =
-			InputHelper.ReadDateTime ( "Enter new due date (yyyy-MM-dd) (leave blank to keep current): " );
+		var choice = InputHelper.ReadInt ( "Enter your choice: " );
 
-		var newProject = InputHelper
-			.ReadOptionalString ( "Enter new project name (leave blank to keep current): " );
+		ConsoleHelper.Clear ();
 
-		Console.WriteLine ( taskManager.UpdateTask ( id,
-			title: string.IsNullOrWhiteSpace ( newTitle )
-				? null
-				: newTitle,
-			dueDate: newDueDateInput == DateTime.MaxValue
-				? null
-				: newDueDateInput,
-			project: string.IsNullOrWhiteSpace ( newProject )
-				? null
-				: newProject )
+		bool updated;
+
+		switch ((UpdateMenuOption) choice)
+		{
+			case UpdateMenuOption.EditTitle:
+				updated = taskManager.UpdateTask ( id,
+					title: InputHelper.ReadNonEmptyString ( "Enter new title: " ) );
+				break;
+
+			case UpdateMenuOption.EditDueDate:
+				var newDueDate = InputHelper.ReadDateTime ( "Enter new due date (yyyy-MM-dd, blank to keep current): " );
+
+				if ( newDueDate is null )
+				{
+					Console.WriteLine ( "No changes made." );
+					return;
+				}
+
+				updated = taskManager.UpdateTask ( id, dueDate: newDueDate );
+				break;
+
+			case UpdateMenuOption.EditProject:
+				updated = taskManager.UpdateTask ( id,
+					project: InputHelper.ReadNonEmptyString ( "Enter new project name: " ) );
+				break;
+
+			default:
+				Console.WriteLine ( "Invalid choice. Please try again." );
+				return;
+		}
+
+		Console.WriteLine ( updated
 			? $"Task with ID {id} updated."
 			: $"No task found with ID {id}." );
-
-		return;
 	}
 
 	/// <summary>
@@ -217,14 +237,13 @@ public static class MenuHandlers
 	/// Marks a task as completed based on its ID.
 	/// </summary>
 	/// <param name="taskManager">The <see cref="TaskManager"/> instance used to manage tasks.</param>
+	/// <param name="id">The unique identifier of the task to be marked as completed.</param>
 	/// <remarks>
 	/// Prompts the user to enter the ID of the task they wish to complete. If the task is found, 
 	/// it is marked as completed. Otherwise, a message is displayed indicating that no task was found with the specified ID.
 	/// </remarks>
-	public static void HandleCompleteTask ( TaskManager taskManager )
+	public static void HandleCompleteTask ( TaskManager taskManager, int id )
 	{
-		var id = InputHelper.ReadInt ( "Enter the ID of the task to complete: " );
-
 		Console.WriteLine ( taskManager.UpdateTask ( id, state: TaskState.Completed )
 			? $"Task with ID {id} marked as completed."
 			: $"No task found with ID {id}." );

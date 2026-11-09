@@ -16,10 +16,10 @@ public record TaskItem (
 	/// <summary>
 	/// Gets a value indicating whether the task is overdue.
 	/// </summary>
-	/// <value>
-	/// <c>true</c> if the current date and time is greater than or equal to the task's due date; otherwise, <c>false</c>.
-	/// </value>
-	public bool IsOverdue => DateTime.Now >= DueDate;
+	/// <remarks>
+	/// A task is considered overdue if its due date is earlier than the current date.
+	/// </remarks>
+	public bool IsOverdue => DueDate.Date < DateTime.Today;
 	
 	/// <summary>
 	/// Gets a value indicating whether the task has been completed.
