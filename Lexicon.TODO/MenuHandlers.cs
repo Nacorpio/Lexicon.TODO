@@ -115,6 +115,9 @@ public static class MenuHandlers
 
 		ConsoleHelper.Clear ();
 
+		ConsoleHelper.PrintTasks ( [task] );
+		ConsoleHelper.PrintLine ();
+
 		switch ((EditMenuOption) choice)
 		{
 			case EditMenuOption.MarkAsCompleted:
@@ -169,6 +172,7 @@ public static class MenuHandlers
 		var choice = InputHelper.ReadInt ( "Enter your choice: " );
 
 		ConsoleHelper.Clear ();
+
 
 		bool updated;
 

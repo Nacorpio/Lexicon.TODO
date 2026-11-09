@@ -69,7 +69,6 @@ public class TaskStorage
 		var json = JsonSerializer.Serialize ( tasks, JsonOptions );
 
 		File.WriteAllText ( FilePath, json );
-		File.Move ( tempPath, FilePath, overwrite: true );
 	}
 
 	/// <summary>
