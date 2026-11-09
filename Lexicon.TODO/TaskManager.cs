@@ -81,6 +81,8 @@ public class TaskManager
 		return true;
 	}
 
+	public bool ContainsTask(int id) => tasks.Any(t => t.Id == id);
+
 	/// <summary>Marks a task completed. Completing an already completed task is not an error.</summary>
 	/// <returns><see langword="false"/> only if no task has this <paramref name="id"/>.</returns>
 	public bool CompleteTask(int id)

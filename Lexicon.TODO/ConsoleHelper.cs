@@ -5,9 +5,11 @@ using System.Text;
 namespace Lexicon.TODO;
 
 public record ColumnDefinition(string Header, ColumnAlignment Alignment, Func<TaskItem, string> ValueSelector);
+public record ColumnSnapshot(string Header, int Width, ColumnAlignment Alignment, string );
+
 public enum ColumnAlignment { Left, Right }
 
-public static class ConsoleHelper
+public static partial class ConsoleHelper
 {
 	private static readonly IReadOnlyList<ColumnDefinition> DefaultTaskColumns =
 	[
@@ -71,27 +73,5 @@ public static class ConsoleHelper
 		PrintLine();
 	}
 
-	public static void PrintTable(
-		IReadOnlyList<ColumnDefinition> columnDefs,
-		IReadOnlyList<TaskItem> tasks,
-		string separator)
-	{
-		int[] widths = new int[columnDefs.Count];
-		ColumnAlignment[] alignments = new ColumnAlignment[columnDefs.Count];
-
-		for (var i = 0; i < columnDefs.Count; i++)
-		{
-			widths[i] = Math.Max(columnDefs[i].Header.Length,
-				tasks.Max(task => columnDefs[i].ValueSelector(task).Length));
-
-			alignments[i] = columnDefs[i].Alignment;
-		}
-
-		PrintRow([.. columnDefs.Select(cd => cd.Header)], widths, alignments, separator, ConsoleColor.Cyan);
-
-		foreach (var task in tasks)
-		{
-			PrintRow([.. columnDefs.Select(cd => cd.ValueSelector(task))], widths, alignments, separator);
-		}
-	}
+	
 }

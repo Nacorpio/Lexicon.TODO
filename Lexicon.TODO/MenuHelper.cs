@@ -53,7 +53,10 @@ public static class MenuHelper
 	/// <param name="description">The description text to include in the width calculation.</param>
 	/// <param name="getLabel">A delegate that returns the display label for an enum value.</param>
 	/// <returns>The greater of the header length and the maximum formatted menu item length.</returns>
-	private static int CalculateDividerLength<T>(string header, string? description, Func<T, string> getLabel) where T : struct, Enum
+	private static int CalculateDividerLength<T>(
+		string header, string? description, 
+		Func<T, string> getLabel) 
+		where T : struct, Enum
 	{
 		var menuItems = Enum.GetValues<T>();
 		var menuItemCount = menuItems.Length;

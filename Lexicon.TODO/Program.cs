@@ -10,7 +10,10 @@ try
 	{
 		Console.Clear();
 
-		MenuHelper.ShowMenu<MainMenuOption>("Main Menu", $"You have {taskManager.PendingTasks.Count} tasks to do, and {taskManager.CompletedTasks.Count} completed.", option => option.ToLabel(), ConsoleColor.Green);
+		MenuHelper.ShowMenu<MainMenuOption>("Main Menu",
+			description: $"You have {taskManager.PendingTasks.Count} tasks to do, and {taskManager.CompletedTasks.Count} completed.", 
+			getLabel: option => option.ToLabel(), 
+			headerColor: ConsoleColor.Green);
 
 		var choice = InputHelper.ReadInt("Enter your choice: ");
 

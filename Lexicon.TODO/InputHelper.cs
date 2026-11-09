@@ -22,6 +22,23 @@ public static class InputHelper
 		}
 	}
 
+	public static bool Confirm(string prompt)
+	{
+		while (true)
+		{
+			Console.Write(prompt);
+
+			var input = ReadLineOrThrow().Trim().ToLowerInvariant();
+
+			if (input == "y" || input == "yes")
+				return true;
+			if (input == "n" || input == "no")
+				return false;
+
+			Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
+		}
+	}
+
 	public static string? ReadOptionalString(string prompt)
 	{
 		Console.Write(prompt);
