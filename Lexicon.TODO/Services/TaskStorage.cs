@@ -68,11 +68,7 @@ public class TaskStorage
 
 		var json = JsonSerializer.Serialize ( tasks, JsonOptions );
 
-		// Write to a temp file first, then replace the real one, so a crash
-		// halfway through the write cannot destroy the existing data.
-		var tempPath = FilePath + ".tmp";
-
-		File.WriteAllText ( tempPath, json );
+		File.WriteAllText ( FilePath, json );
 		File.Move ( tempPath, FilePath, overwrite: true );
 	}
 

@@ -3,8 +3,12 @@ using Lexicon.TODO.Helpers;
 using Lexicon.TODO.Models;
 using Lexicon.TODO.Services;
 
-var taskManager = new TaskManager ();
-var taskStorage = new TaskStorage ( "tasks.json" );
+string filePath = Path.Combine ( AppContext.BaseDirectory, "Data", "tasks.json" );
+
+TaskStorage taskStorage = new ( filePath );
+TaskManager taskManager = new ();
+
+taskStorage.Load ();
 
 try
 {
@@ -38,7 +42,16 @@ try
 
 			case MainMenuOption.Quit:
 			{
-				taskStorage.SaveTasks ( [.. taskManager.Tasks] );
+				try
+				{
+					taskStorage.Save ( [.. taskManager.Tasks] );
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine ( $"Error saving tasks: {ex.Message}" );
+					break;
+				}
+
 				Console.WriteLine ( "Exiting..." );
 
 				return 0;
