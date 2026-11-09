@@ -75,4 +75,28 @@ public class TaskStorage
 		File.WriteAllText ( tempPath, json );
 		File.Move ( tempPath, FilePath, overwrite: true );
 	}
+
+	/// <summary>
+	/// Loads the list of tasks from the JSON file specified by <see cref="FilePath"/>.
+	/// </summary>
+	/// <returns>
+	/// A <see cref="List{T}"/> of <see cref="TaskItem"/> objects representing the tasks.
+	/// If the file does not exist or is empty, an empty list is returned.
+	/// </returns>
+	/// <remarks>
+	/// This method reads the contents of the JSON file, deserializes it into a list of <see cref="TaskItem"/> objects,
+	/// and returns the result. If the file is missing, it safely returns an empty list to avoid exceptions.
+	/// </remarks>
+	/// <exception cref="JsonException">
+	/// Thrown if the JSON content in the file is invalid or cannot be deserialized into a list of <see cref="TaskItem"/>.
+	/// </exception>
+	public List<TaskItem> Load ()
+	{
+		if ( !File.Exists ( FilePath ) )
+			return [];
+
+		var json = File.ReadAllText ( FilePath );
+
+		return JsonSerializer.Deserialize<List<TaskItem>> ( json, JsonOptions ) ?? [];
+	}
 }
