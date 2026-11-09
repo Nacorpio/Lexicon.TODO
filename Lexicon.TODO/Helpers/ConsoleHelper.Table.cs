@@ -193,32 +193,4 @@ public static partial class ConsoleHelper
 			separator,
 			ConsoleColor.Cyan );
 	}
-
-	/// <summary>
-	/// Prints the rows of a task table to the console.
-	/// </summary>
-	/// <param name="columnDefs">The definitions of the columns, including headers and value selectors.</param>
-	/// <param name="tasks">The list of tasks to be displayed in the table.</param>
-	/// <param name="widths">The widths of each column.</param>
-	/// <param name="alignments">The alignment of each column (left or right).</param>
-	/// <param name="separator">The string used to separate columns in the table rows.</param>
-	/// <remarks>
-	/// This method iterates through the provided tasks, formats their values according to the column definitions,
-	/// and prints each row with the specified alignment and separator.
-	/// </remarks>
-	private static void PrintTaskRows (
-		IReadOnlyList<ColumnDefinition> columnDefs,
-		IReadOnlyList<TaskItem> tasks,
-		int[] widths,
-		ColumnAlignment[] alignments,
-		string separator )
-	{
-		foreach ( TaskItem task in tasks )
-		{
-			PrintRow ( [.. columnDefs.Select ( cd => cd.ValueSelector ( task ) )],
-				widths,
-				alignments,
-				separator );
-		}
-	}
 }

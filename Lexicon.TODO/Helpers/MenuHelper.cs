@@ -1,7 +1,14 @@
-﻿namespace Lexicon.TODO.Helpers;
+﻿using System.Globalization;
 
+namespace Lexicon.TODO.Helpers;
+
+/// <summary>
+/// Renders numbered console menus from the values of an enum.
+/// </summary>
 public static class MenuHelper
 {
+	private const ConsoleColor DividerColor = ConsoleColor.DarkGray;
+
 	/// <summary>
 	/// Displays a menu based on the values of a specified enum type.
 	/// </summary>
@@ -11,7 +18,9 @@ public static class MenuHelper
 	/// <param name="getLabel">A function that provides the display label for each enum value.</param>
 	/// <param name="headerColor">Optional color for the header text. If not specified, the default console color is used.</param>
 	/// <remarks>
-	/// Each menu option is displayed in the format: `{number}. {label}`, where `{number}` is the numeric value of the enum and `{label}` is the text returned by <paramref name="getLabel"/>.
+	/// Each menu option is displayed in the format <c>{number}. {label}</c>, where <c>{number}</c> is the numeric
+	/// value of the enum and <c>{label}</c> is the text returned by <paramref name="getLabel"/>.
+	/// Divider lines are as wide as the widest of the header, the description, and the formatted menu items.
 	/// </remarks>
 	public static void ShowMenu<TEnum> (
 		string header, string? description,
@@ -20,23 +29,55 @@ public static class MenuHelper
 		where TEnum : struct, Enum
 	{
 		var menuItems = Enum.GetValues<TEnum> ();
+		var width = CalculateMenuWidth ( header, description, menuItems, getLabel );
 
-		ConsoleHelper.PrintMenuDivider ( header, description, getLabel, ConsoleColor.DarkGray );
+		ConsoleHelper.PrintDivider ( width, color: DividerColor );
 		ConsoleHelper.PrintLine ( header.ToUpperInvariant (), headerColor );
 
-		// If a description is provided, print it in dark gray color below the header.
 		if ( !string.IsNullOrWhiteSpace ( description ) )
 		{
-			ConsoleHelper.PrintMenuDivider ( header, description, getLabel, ConsoleColor.DarkGray );
-			ConsoleHelper.PrintLine ( description, ConsoleColor.DarkGray );
+			ConsoleHelper.PrintDivider ( width, color: DividerColor );
+			ConsoleHelper.PrintLine ( description, DividerColor );
 		}
 
-		ConsoleHelper.PrintMenuDivider ( header, description, getLabel, ConsoleColor.DarkGray);
+		ConsoleHelper.PrintDivider ( width, color: DividerColor );
 
-		// Print each menu option with its corresponding numeric value and label.
 		foreach ( TEnum option in menuItems )
-			ConsoleHelper.PrintLine ( $"{Convert.ToInt32 ( option )}. {getLabel ( option )}" );
+			ConsoleHelper.PrintLine ( FormatMenuItem ( option, getLabel ) );
 
-		ConsoleHelper.PrintMenuDivider ( header, description, getLabel, ConsoleColor.DarkGray );
+		ConsoleHelper.PrintDivider ( width, color: DividerColor );
+	}
+
+	/// <summary>
+	/// Formats a single menu item as <c>{number}. {label}</c>.
+	/// </summary>
+	private static string FormatMenuItem<TEnum> ( TEnum option, Func<TEnum, string> getLabel )
+		where TEnum : struct, Enum =>
+		$"{Convert.ToInt32 ( option, CultureInfo.InvariantCulture )}. {getLabel ( option )}";
+
+	/// <summary>
+	/// Calculates the divider width: the widest of the header, the description, and the formatted menu items.
+	/// </summary>
+	/// <remarks>
+	/// Measures the same string that <see cref="ShowMenu{TEnum}"/> prints, so the width cannot drift from the output.
+	/// An enum with no values yields the header or description width.
+	/// </remarks>
+	private static int CalculateMenuWidth<TEnum> (
+		string header, string? description,
+		TEnum[] menuItems,
+		Func<TEnum, string> getLabel )
+		where TEnum : struct, Enum
+	{
+		var width = menuItems
+			.Select ( option => FormatMenuItem ( option, getLabel ).Length )
+			.DefaultIfEmpty ( 0 )
+			.Max ();
+
+		width = Math.Max ( width, header.Length );
+
+		if ( !string.IsNullOrWhiteSpace ( description ) )
+			width = Math.Max ( width, description.Length );
+
+		return width;
 	}
 }

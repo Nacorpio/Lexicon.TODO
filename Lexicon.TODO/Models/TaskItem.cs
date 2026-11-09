@@ -4,7 +4,7 @@
 /// Represents a task item with details such as ID, title, due date, state, and associated project.
 /// </summary>
 /// <remarks>
-/// This record is used to encapsulate the properties of a task and provides functionality to determine if the task is overdue.
+/// This record encapsulates the properties of a task and offers state and due-date convenience checks.
 /// </remarks>
 public record TaskItem (
 	int Id,
@@ -14,12 +14,16 @@ public record TaskItem (
 	string? Project )
 {
 	/// <summary>
-	/// Gets a value indicating whether the task is overdue.
+	/// Determines whether the task's due date falls before the given day.
 	/// </summary>
+	/// <param name="today">The date to compare against; only its date component is used.</param>
+	/// <returns><see langword="true"/> if the due date is earlier than <paramref name="today"/>.</returns>
 	/// <remarks>
-	/// A task is considered overdue if its due date is earlier than the current date.
+	/// This check ignores the task's state. Callers that want "pending and overdue" combine it with <see cref="IsPending"/>.
+	/// Taking the date as a parameter keeps this record free of clock dependencies.
 	/// </remarks>
-	public bool IsOverdue => DueDate.Date < DateTime.Today;
+	public bool IsOverdueOn ( DateTime today ) => DueDate.Date < today.Date;
+	
 	
 	/// <summary>
 	/// Gets a value indicating whether the task has been completed.

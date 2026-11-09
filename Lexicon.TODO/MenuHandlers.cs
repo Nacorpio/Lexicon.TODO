@@ -28,7 +28,7 @@ public static class MenuHandlers
 	{
 		MenuHelper.ShowMenu<SortMenuOption> (
 			header: "Sort Tasks",
-			description: $"Choose how to sort the tasks",
+			description: "Choose how to sort the tasks",
 			getLabel: option => option.ToLabel (),
 			headerColor: ConsoleColor.Green );
 
@@ -74,10 +74,7 @@ public static class MenuHandlers
 		var dueDate = InputHelper.ReadRequiredDateTime ( "Enter due date (yyyy-MM-dd): " );
 		var project = InputHelper.ReadOptionalString ( "Enter project name (optional): " );
 
-		TaskItem task = taskManager.AddTask ( title, dueDate,
-			string.IsNullOrWhiteSpace ( project )
-				? null
-				: project );
+		TaskItem task = taskManager.AddTask ( title, dueDate, project );
 
 		Console.WriteLine ( $"Task added with ID: {task.Id}" );
 	}
@@ -183,15 +180,8 @@ public static class MenuHandlers
 				break;
 
 			case UpdateMenuOption.EditDueDate:
-				var newDueDate = InputHelper.ReadDateTime ( "Enter new due date (yyyy-MM-dd, blank to keep current): " );
-
-				if ( newDueDate is null )
-				{
-					Console.WriteLine ( "No changes made." );
-					return;
-				}
-
-				updated = taskManager.UpdateTask ( id, dueDate: newDueDate );
+				updated = taskManager.UpdateTask ( id,
+					dueDate: InputHelper.ReadDateTime ( "Enter new due date (yyyy-MM-dd): " ) );
 				break;
 
 			case UpdateMenuOption.EditProject:
@@ -215,11 +205,10 @@ public static class MenuHandlers
 	/// <param name="taskManager">The <see cref="TaskManager"/> instance used to manage tasks.</param>
 	/// <param name="id">The unique identifier of the task to be deleted.</param>
 	/// <remarks>
-	/// This method prompts the user to enter the ID of the task to delete. If the task exists, 
-	/// the user is asked to confirm the deletion. Upon confirmation, the task is deleted. 
-	/// If the task does not exist or the deletion is canceled, appropriate messages are displayed.
+	/// Asks the user to confirm the deletion. Upon confirmation, the task is deleted.
+	/// If the task does not exist or the deletion is cancelled, an appropriate message is displayed.
 	/// </remarks>
-	public static void HandleDeleteTask ( TaskManager taskManager, int id )
+	private static void HandleDeleteTask ( TaskManager taskManager, int id )
 	{
 		if ( InputHelper.Confirm ( $"Are you sure you want to delete task with ID {id}? (y/n): " ) )
 		{
@@ -239,12 +228,12 @@ public static class MenuHandlers
 	/// <param name="taskManager">The <see cref="TaskManager"/> instance used to manage tasks.</param>
 	/// <param name="id">The unique identifier of the task to be marked as completed.</param>
 	/// <remarks>
-	/// Prompts the user to enter the ID of the task they wish to complete. If the task is found, 
-	/// it is marked as completed. Otherwise, a message is displayed indicating that no task was found with the specified ID.
+	/// If the task is found, it is marked as completed. Otherwise, a message is displayed
+	/// indicating that no task was found with the specified ID.
 	/// </remarks>
-	public static void HandleCompleteTask ( TaskManager taskManager, int id )
+	private static void HandleCompleteTask ( TaskManager taskManager, int id )
 	{
-		Console.WriteLine ( taskManager.UpdateTask ( id, state: TaskState.Completed )
+		Console.WriteLine ( taskManager.CompleteTask ( id )
 			? $"Task with ID {id} marked as completed."
 			: $"No task found with ID {id}." );
 	}

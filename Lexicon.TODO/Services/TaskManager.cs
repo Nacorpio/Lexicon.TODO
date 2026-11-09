@@ -10,9 +10,19 @@ namespace Lexicon.TODO.Services;
 /// Lookups for a missing ID return <see langword="false"/> or <see langword="null"/>; invalid arguments
 /// (such as an empty title) throw <see cref="ArgumentException"/>.
 /// </remarks>
-public class TaskManager
+/// <param name="timeProvider">
+/// The clock used to decide which tasks are overdue. Defaults to <see cref="TimeProvider.System"/>.
+/// Tests pass a fixed provider so results do not depend on the wall clock.
+/// </param>
+public sealed class TaskManager ( TimeProvider? timeProvider = null )
 {
 	private readonly List<TaskItem> tasks = [];
+	private readonly TimeProvider clock = timeProvider ?? TimeProvider.System;
+
+	/// <summary>
+	/// Gets today's date according to the injected clock, in local time.
+	/// </summary>
+	private DateTime Today => clock.GetLocalNow ().Date;
 
 	/// <summary>
 	/// Allocates a unique identifier for the next task to be added to the task list.
@@ -86,9 +96,19 @@ public class TaskManager
 	/// A read-only list of <see cref="TaskItem"/> instances representing overdue tasks.
 	/// </value>
 	public IReadOnlyList<TaskItem> OverdueTasks => tasks
-		.Where ( t => t is { IsPending: true, IsOverdue: true } )
+		.Where ( IsOverdue )
 		.ToList ()
 		.AsReadOnly ();
+
+	/// <summary>
+	/// Gets the number of overdue tasks without materializing a list.
+	/// </summary>
+	public int OverdueCount => tasks.Count ( IsOverdue );
+
+	/// <summary>
+	/// A task is overdue when it is pending and its due date is before today (per the injected clock).
+	/// </summary>
+	private bool IsOverdue ( TaskItem task ) => task.IsPending && task.IsOverdueOn ( Today );
 
 
 	/// <summary>
@@ -169,18 +189,6 @@ public class TaskManager
 			: project.Trim ();
 
 	/// <summary>
-	/// Determines whether a task with the specified ID exists in the task collection.
-	/// </summary>
-	/// <param name="id">The unique identifier of the task to locate.</param>
-	/// <returns>
-	/// <see langword="true"/> if a task with the specified ID exists; otherwise, <see langword="false"/>.
-	/// </returns>
-	/// <remarks>
-	/// This method performs a search within the in-memory task collection to check for the existence of a task with the given ID.
-	/// </remarks>
-	public bool ContainsTask ( int id ) => tasks.Any ( t => t.Id == id );
-
-	/// <summary>
 	/// Marks the task with the specified <paramref name="id"/> as completed.
 	/// </summary>
 	/// <param name="id">The unique identifier of the task to mark as completed.</param>
@@ -234,20 +242,6 @@ public class TaskManager
 
 
 	/// <summary>
-	/// Retrieves all tasks managed by the <see cref="TaskManager"/>.
-	/// </summary>
-	/// <returns>
-	/// A read-only list of all tasks currently managed by the <see cref="TaskManager"/>.
-	/// </returns>
-	/// <remarks>
-	/// The returned list is a live view of the internal task collection, meaning any changes
-	/// to the tasks within the <see cref="TaskManager"/> will be reflected in the returned list.
-	/// </remarks>
-	public IReadOnlyList<TaskItem> GetAllTasks () => tasks
-		.AsReadOnly ();
-
-
-	/// <summary>
 	/// Retrieves a read-only list of all tasks sorted by their due date in ascending order.
 	/// </summary>
 	/// <returns>
@@ -267,14 +261,14 @@ public class TaskManager
 	/// </summary>
 	/// <remarks>
 	/// Tasks are first sorted by whether they have an associated project (tasks without a project appear last),
-	/// then alphabetically by project name, and finally by due date within each project.
+	/// then by project name using an ordinal, case-insensitive comparison, and finally by due date within each project.
 	/// </remarks>
 	/// <returns>
 	/// A read-only list of <see cref="TaskItem"/> objects sorted by project and due date.
 	/// </returns>
 	public IReadOnlyList<TaskItem> GetTasksSortedByProject () => tasks
 		.OrderBy ( t => t.Project is null )
-		.ThenBy ( t => t.Project )
+		.ThenBy ( t => t.Project, StringComparer.OrdinalIgnoreCase )
 		.ThenBy ( t => t.DueDate )
 		.ToList ()
 		.AsReadOnly ();

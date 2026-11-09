@@ -3,16 +3,7 @@
 /// <summary>
 /// Represents the available options in the edit menu.
 /// </summary>
-/// <summary>
-/// Option to update the details of a task.
-/// </summary>
-/// <summary>
-/// Option to mark a task as completed.
-/// </summary>
-/// <summary>
-/// Option to delete a task.
-/// </summary>
-public enum EditMenuOption 
+public enum EditMenuOption
 {
 	/// <summary>
 	/// Represents the option to update the details of an existing task in the edit menu.

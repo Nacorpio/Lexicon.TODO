@@ -1,7 +1,11 @@
 ﻿using Lexicon.TODO.Models;
 
-namespace Lexicon.TODO;
+namespace Lexicon.TODO.Helpers;
 
+/// <summary>
+/// Display labels for the menu enums. Each switch is exhaustive, so adding an enum member without a label
+/// throws at first use rather than printing the raw member name.
+/// </summary>
 public static class MenuLabels
 {
 	/// <summary>

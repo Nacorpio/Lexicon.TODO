@@ -15,7 +15,7 @@ try
 
 		MenuHelper.ShowMenu<MainMenuOption> ( "Main Menu",
 			description:
-			$"You have {taskManager.PendingCount} tasks to do, and {taskManager.CompletedCount} completed.",
+			$"You have {taskManager.PendingCount} tasks to do ({taskManager.OverdueCount} overdue), and {taskManager.CompletedCount} completed.",
 			getLabel: option => option.ToLabel (),
 			headerColor: ConsoleColor.Green );
 
