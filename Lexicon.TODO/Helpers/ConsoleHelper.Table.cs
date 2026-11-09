@@ -1,6 +1,27 @@
 ﻿namespace Lexicon.TODO.Helpers;
 
 /// <summary>
+/// Defines a column in a tabular display of task information.
+/// </summary>
+/// <remarks>
+/// Each column is characterized by a header, an alignment, and a function to extract the corresponding value from a <see cref="TaskItem"/>.
+/// This record is primarily used to configure the layout and content of task tables displayed in the console.
+/// </remarks>
+public record ColumnDefinition ( string Header, ColumnAlignment Alignment, Func<TaskItem, string> ValueSelector );
+
+/// <summary>
+/// Specifies the alignment of content within a column.
+/// </summary>
+/// <remarks>
+/// This enumeration is used to define how text is aligned in a column when displaying data in a tabular format.
+/// </remarks>
+public enum ColumnAlignment
+{
+	Left,
+	Right
+}
+
+/// <summary>
 /// Provides helper methods for console-based operations, such as printing formatted tables and rows.
 /// </summary>
 /// <remarks>
@@ -19,18 +40,21 @@ public static partial class ConsoleHelper
 	/// This method renders a table with a header row and task rows. It calculates column widths and aligns content
 	/// based on the provided column definitions. The table is printed row by row to the console.
 	/// </remarks>
-	public static void PrintTable(
+	public static void PrintTable (
 		IReadOnlyList<ColumnDefinition> columnDefs,
 		IReadOnlyList<TaskItem> tasks,
-		string separator)
+		string separator )
 	{
-		if (columnDefs.Count == 0) 
+		if ( columnDefs.Count == 0 )
 			return;
 
-		(int[] widths, var alignments, var rows) = PrepareTable(columnDefs, tasks);
+		(int[] widths, var alignments, var rows) = PrepareTable ( columnDefs, tasks );
 
-		PrintHeader(columnDefs, widths, alignments, separator);
-		PrintTaskRows(rows, widths, alignments, separator);
+		var dividerLength = widths.Sum () + (separator.Length * (widths.Length - 1));
+
+		PrintHeader ( columnDefs, widths, alignments, separator );
+		PrintDivider ( dividerLength, separator );
+		PrintTaskRows ( rows, widths, alignments, separator );
 	}
 
 	/// <summary>
@@ -44,15 +68,15 @@ public static partial class ConsoleHelper
 	/// This method iterates through the provided rows and prints each row to the console.
 	/// Each row is formatted according to the specified column widths and alignments.
 	/// </remarks>
-	private static void PrintTaskRows(
+	private static void PrintTaskRows (
 		IReadOnlyList<string[]> rows,
 		int[] widths,
 		ColumnAlignment[] alignments,
-		string separator)
+		string separator )
 	{
-		foreach (var row in rows)
+		foreach ( var row in rows )
 		{
-			PrintRow(row, widths, alignments, separator);
+			PrintRow ( row, widths, alignments, separator );
 		}
 	}
 
@@ -73,14 +97,14 @@ public static partial class ConsoleHelper
 	/// This method calculates the maximum width for each column based on the header and the values of the tasks.
 	/// It also determines the alignment for each column and constructs the rows of the table.
 	/// </remarks>
-	private static (int[] Widths, ColumnAlignment[] Alignments, List<string[]> Rows) PrepareTable(
+	private static (int[] Widths, ColumnAlignment[] Alignments, List<string[]> Rows) PrepareTable (
 		IReadOnlyList<ColumnDefinition> columnDefs,
-		IReadOnlyList<TaskItem> tasks)
+		IReadOnlyList<TaskItem> tasks )
 	{
 		int columnCount = columnDefs.Count;
 		var widths = new int[columnCount];
 		var alignments = new ColumnAlignment[columnCount];
-		var rows = new List<string[]>(tasks.Count);
+		var rows = new List<string[]> ( tasks.Count );
 
 		for (int i = 0; i < columnCount; i++)
 		{
@@ -88,18 +112,18 @@ public static partial class ConsoleHelper
 			alignments[i] = columnDefs[i].Alignment;
 		}
 
-		foreach (TaskItem task in tasks)
+		foreach ( TaskItem task in tasks )
 		{
 			var row = new string[columnCount];
 
 			for (int i = 0; i < columnCount; i++)
 			{
-				var value = columnDefs[i].ValueSelector(task) ?? string.Empty;
+				var value = columnDefs[i].ValueSelector ( task ) ?? string.Empty;
 				row[i] = value;
-				if (value.Length > widths[i]) widths[i] = value.Length;
+				if ( value.Length > widths[i] ) widths[i] = value.Length;
 			}
 
-			rows.Add(row);
+			rows.Add ( row );
 		}
 
 		return (widths, alignments, rows);
@@ -121,22 +145,23 @@ public static partial class ConsoleHelper
 	/// <exception cref="ArgumentException">
 	/// Thrown if the lengths of <paramref name="columns"/>, <paramref name="widths"/>, and <paramref name="alignments"/> do not match.
 	/// </exception>
-	public static void PrintRow(string[] columns, int[] widths, ColumnAlignment[] alignments, string separator, ConsoleColor? color = null)
+	public static void PrintRow (
+		string[] columns, int[] widths, ColumnAlignment[] alignments, string separator, ConsoleColor? color = null )
 	{
-		if (columns.Length != widths.Length || columns.Length != alignments.Length)
-			throw new ArgumentException("Columns, widths, and alignments must have the same length.");
+		if ( columns.Length != widths.Length || columns.Length != alignments.Length )
+			throw new ArgumentException ( "Columns, widths, and alignments must have the same length." );
 
 		for (var i = 0; i < columns.Length; i++)
 		{
-			if (i > 0)
-				Print(separator);
+			if ( i > 0 )
+				Print ( separator );
 
 			Print ( alignments[i] == ColumnAlignment.Right
 				? columns[i].PadLeft ( widths[i] )
 				: columns[i].PadRight ( widths[i] ), color );
 		}
 
-		PrintLine();
+		PrintLine ();
 	}
 
 
@@ -154,17 +179,17 @@ public static partial class ConsoleHelper
 	/// <exception cref="ArgumentException">
 	/// Thrown if the lengths of <paramref name="columnDefs"/>, <paramref name="widths"/>, and <paramref name="alignments"/> do not match.
 	/// </exception>
-	private static void PrintHeader(
+	private static void PrintHeader (
 		IReadOnlyList<ColumnDefinition> columnDefs,
 		int[] widths,
 		ColumnAlignment[] alignments,
-		string separator)
+		string separator )
 	{
-		PrintRow([.. columnDefs.Select(cd => cd.Header)], 
-			widths, 
+		PrintRow ( [.. columnDefs.Select ( cd => cd.Header )],
+			widths,
 			alignments,
-			separator, 
-			ConsoleColor.Cyan);
+			separator,
+			ConsoleColor.Cyan );
 	}
 
 	/// <summary>
@@ -179,19 +204,19 @@ public static partial class ConsoleHelper
 	/// This method iterates through the provided tasks, formats their values according to the column definitions,
 	/// and prints each row with the specified alignment and separator.
 	/// </remarks>
-	private static void PrintTaskRows(
+	private static void PrintTaskRows (
 		IReadOnlyList<ColumnDefinition> columnDefs,
 		IReadOnlyList<TaskItem> tasks,
 		int[] widths,
 		ColumnAlignment[] alignments,
-		string separator)
+		string separator )
 	{
-		foreach (TaskItem task in tasks)
+		foreach ( TaskItem task in tasks )
 		{
-			PrintRow([.. columnDefs.Select(cd => cd.ValueSelector(task))], 
-				widths, 
-				alignments, 
-				separator);
+			PrintRow ( [.. columnDefs.Select ( cd => cd.ValueSelector ( task ) )],
+				widths,
+				alignments,
+				separator );
 		}
 	}
 }

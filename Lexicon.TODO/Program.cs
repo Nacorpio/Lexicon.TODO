@@ -1,62 +1,65 @@
 ﻿using Lexicon.TODO;
 using Lexicon.TODO.Helpers;
 
-var taskManager = new TaskManager();
+var taskManager = new TaskManager ();
 
-AddSampleTasks(taskManager);
+AddSampleTasks ( taskManager );
 
-try 
+try
 {
 	while (true)
 	{
-		Console.Clear();
+		Console.Clear ();
 
-		MenuHelper.ShowMenu<MainMenuOption>("Main Menu",
-			description: $"You have {taskManager.PendingTasks.Count} tasks to do, and {taskManager.CompletedTasks.Count} completed.", 
-			getLabel: option => option.ToLabel(), 
-			headerColor: ConsoleColor.Green);
+		MenuHelper.ShowMenu<MainMenuOption> ( "Main Menu",
+			description:
+			$"You have {taskManager.PendingTasks.Count} tasks to do, and {taskManager.CompletedTasks.Count} completed.",
+			getLabel: option => option.ToLabel (),
+			headerColor: ConsoleColor.Green );
 
-		var choice = InputHelper.ReadInt("Enter your choice: ");
+		var choice = InputHelper.ReadInt ( "Enter your choice: " );
 
-		Console.Clear();
+		Console.Clear ();
 
-		switch ((MainMenuOption)choice)
+		switch ((MainMenuOption) choice)
 		{
 			case MainMenuOption.AddTask:
-				MenuHandlers.HandleAddTask(taskManager);
+				MenuHandlers.HandleAddTask ( taskManager );
 				break;
 
 			case MainMenuOption.ShowTasks:
-				MenuHandlers.HandleShowTasks(taskManager);
+				MenuHandlers.HandleShowTasks ( taskManager );
 				break;
 
 			case MainMenuOption.EditTask:
-				MenuHandlers.HandleEditTask(taskManager);
+				MenuHandlers.HandleEditTask ( taskManager );
 				break;
 
 			case MainMenuOption.SaveAndQuit:
-				Console.WriteLine("Exiting...");
+				Console.WriteLine ( "Exiting..." );
 				return;
 
 			default:
-				Console.WriteLine("Invalid choice. Please try again.");
+				Console.WriteLine ( "Invalid choice. Please try again." );
 				break;
 		}
 
-		Console.WriteLine();
-		Console.WriteLine("Press Enter to continue...");
+		Console.WriteLine ();
+		Console.WriteLine ( "Press Enter to continue..." );
 
-		Console.ReadLine();
+		Console.ReadLine ();
 	}
 }
 catch (EndOfStreamException)
 {
-	Console.WriteLine("Input ended unexpectedly. Exiting...");
+	Console.WriteLine ( "Input ended unexpectedly. Exiting..." );
 }
 
-static void AddSampleTasks(TaskManager taskManager)
+return;
+
+static void AddSampleTasks ( TaskManager taskManager )
 {
-	taskManager.AddTask("Finish project report", new DateTime(2024, 6, 15), "Work");
-	taskManager.AddTask("Grocery shopping", new DateTime(2024, 6, 10), "Personal");
-	taskManager.AddTask("Doctor's appointment", new DateTime(2024, 6, 12), "Health");
+	taskManager.AddTask ( "Finish project report", new DateTime ( 2024, 6, 15 ), "Work" );
+	taskManager.AddTask ( "Grocery shopping", new DateTime ( 2024, 6, 10 ), "Personal" );
+	taskManager.AddTask ( "Doctor's appointment", new DateTime ( 2024, 6, 12 ), "Health" );
 }

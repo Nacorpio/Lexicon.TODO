@@ -1,26 +1,5 @@
 ﻿namespace Lexicon.TODO.Helpers;
 
-/// <summary>
-/// Defines a column in a tabular display of task information.
-/// </summary>
-/// <remarks>
-/// Each column is characterized by a header, an alignment, and a function to extract the corresponding value from a <see cref="TaskItem"/>.
-/// This record is primarily used to configure the layout and content of task tables displayed in the console.
-/// </remarks>
-public record ColumnDefinition ( string Header, ColumnAlignment Alignment, Func<TaskItem, string> ValueSelector );
-
-/// <summary>
-/// Specifies the alignment of content within a column.
-/// </summary>
-/// <remarks>
-/// This enumeration is used to define how text is aligned in a column when displaying data in a tabular format.
-/// </remarks>
-public enum ColumnAlignment
-{
-	Left,
-	Right
-}
-
 public static partial class ConsoleHelper
 {
 	/// <summary>
@@ -38,14 +17,14 @@ public static partial class ConsoleHelper
 	/// </remarks>
 	private static readonly IReadOnlyList<ColumnDefinition> DefaultTaskColumns =
 	[
-		new ColumnDefinition ( "ID", ColumnAlignment.Right, static task => task.Id.ToString () ),
-		new ColumnDefinition ( "Title", ColumnAlignment.Left, static task => task.Title ),
-		new ColumnDefinition ( "Due Date", ColumnAlignment.Left, static task => task.DueDate.ToString ( "yyyy-MM-dd" ) ),
-		new ColumnDefinition ( "Project", ColumnAlignment.Left, static task => task.Project ?? string.Empty ),
-		new ColumnDefinition ( "State", ColumnAlignment.Left, static task => task.State.ToString () )
+		new ( "ID", ColumnAlignment.Right, static task => task.Id.ToString () ),
+		new ( "Title", ColumnAlignment.Left, static task => task.Title ),
+		new ( "Due Date", ColumnAlignment.Left, static task => task.DueDate.ToString ( "yyyy-MM-dd" ) ),
+		new ( "Project", ColumnAlignment.Left, static task => task.Project ?? string.Empty ),
+		new ( "State", ColumnAlignment.Left, static task => task.State.ToString () )
 	];
 
-	
+
 	/// <summary>
 	/// Prints a message to the console, optionally using a specified color.
 	/// </summary>
@@ -110,10 +89,91 @@ public static partial class ConsoleHelper
 	{
 		if ( tasks.Count == 0 )
 		{
-			ConsoleHelper.PrintLine ( "No tasks available." );
+			PrintLine ( "No tasks available." );
 			return;
 		}
 
 		PrintTable ( DefaultTaskColumns, tasks, " | " );
+	}
+
+	/// <summary>
+	/// Prints a divider line to the console using a specified character and length, optionally with a specified color.
+	/// </summary>
+	/// <param name="length">The length of the divider line. Must be a non-negative value.</param>
+	/// <param name="separator">The string used to create the divider line. If not specified, '-' is used.</param>
+	/// <param name="color">
+	/// An optional <see cref="ConsoleColor"/> to use for the divider line text.
+	/// If not specified, the default console color is used.
+	/// </param>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// Thrown if the <paramref name="length"/> is negative.
+	/// </exception>
+	/// <remarks>
+	/// This method is useful for visually separating sections of console output.
+	/// </remarks>
+	public static void PrintDivider ( int length, 
+		string? separator = null, 
+		ConsoleColor? color = null )
+	{
+		ArgumentOutOfRangeException.ThrowIfNegative ( length );
+		
+		var divider = string.Concat ( Enumerable.Repeat ( separator ?? "-", length ) );
+		
+		PrintLine ( divider, color );
+	}
+
+	/// <summary>
+	/// Prints a divider line to the console, with a length calculated based on the provided header, description, and menu item labels.
+	/// </summary>
+	/// <typeparam name="T">The enum type used to generate menu items.</typeparam>
+	/// <param name="header">The header text displayed above the divider.</param>
+	/// <param name="description">An optional description text displayed above the divider.</param>
+	/// <param name="getLabel">A delegate that returns the display label for an enum value.</param>
+	/// <param name="color">
+	/// An optional <see cref="ConsoleColor"/> to use for the divider line.
+	/// If not specified, the default console color is used.
+	/// </param>
+	/// <remarks>
+	/// The divider length is dynamically calculated to ensure proper alignment with the menu content.
+	/// </remarks>
+	public static void PrintMenuDivider<T> (
+		string header, string? description,
+		Func<T, string> getLabel,
+		ConsoleColor? color = null )
+		where T : struct, Enum
+	{
+		int length = CalculateDividerLength ( header, description, getLabel );
+		var divider = new string ( '-', length );
+
+		PrintLine ( divider, color );
+	}
+
+	/// <summary>
+	/// Calculates the length of the divider required to properly format the menu display.
+	/// </summary>
+	/// <typeparam name="T">The enum type used to generate menu items.</typeparam>
+	/// <param name="header">The header text to include in the calculation.</param>
+	/// <param name="description">The optional description text to include in the calculation.</param>
+	/// <param name="getLabel">A delegate that returns the display label for an enum value.</param>
+	/// <returns>The maximum length between the header, description, and the widest formatted menu item label.</returns>
+	/// <remarks>
+	/// The menu item length is determined by combining the numeric value of the enum, a 3-character separator, 
+	/// and the length of the label returned by <paramref name="getLabel"/>.
+	/// </remarks>
+	private static int CalculateDividerLength<T> (
+		string header, string? description,
+		Func<T, string> getLabel )
+		where T : struct, Enum
+	{
+		var menuItems = Enum.GetValues<T> ();
+
+		int dividerLength = Math.Max ( header.Length,
+			menuItems.Max ( option =>
+				(Convert.ToInt32 ( option ).ToString ().Length + 3 + getLabel ( option ).Length) ) );
+
+		if ( !string.IsNullOrWhiteSpace ( description ) )
+			dividerLength = Math.Max ( dividerLength, description.Length );
+
+		return dividerLength;
 	}
 }
