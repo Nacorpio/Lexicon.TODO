@@ -131,7 +131,7 @@ public static class MenuHandlers
 
 			case EditMenuOption.Delete:
 			{
-				HandleDeleteTask ( taskManager );
+				HandleDeleteTask ( taskManager, id );
 				break;
 			}
 
@@ -166,10 +166,10 @@ public static class MenuHandlers
 	{
 		var newTitle = InputHelper
 			.ReadOptionalString ( "Enter new title (leave blank to keep current): " );
-		
+
 		var newDueDateInput =
 			InputHelper.ReadDateTime ( "Enter new due date (yyyy-MM-dd) (leave blank to keep current): " );
-		
+
 		var newProject = InputHelper
 			.ReadOptionalString ( "Enter new project name (leave blank to keep current): " );
 
@@ -193,21 +193,14 @@ public static class MenuHandlers
 	/// Handles the deletion of a task by its ID.
 	/// </summary>
 	/// <param name="taskManager">The <see cref="TaskManager"/> instance used to manage tasks.</param>
+	/// <param name="id">The unique identifier of the task to be deleted.</param>
 	/// <remarks>
 	/// This method prompts the user to enter the ID of the task to delete. If the task exists, 
 	/// the user is asked to confirm the deletion. Upon confirmation, the task is deleted. 
 	/// If the task does not exist or the deletion is canceled, appropriate messages are displayed.
 	/// </remarks>
-	public static void HandleDeleteTask ( TaskManager taskManager )
+	public static void HandleDeleteTask ( TaskManager taskManager, int id )
 	{
-		var id = InputHelper.ReadInt ( "Enter the ID of the task to delete: " );
-
-		if ( !taskManager.ContainsTask ( id ) )
-		{
-			Console.WriteLine ( $"No task found with ID {id}." );
-			return;
-		}
-
 		if ( InputHelper.Confirm ( $"Are you sure you want to delete task with ID {id}? (y/n): " ) )
 		{
 			Console.WriteLine ( taskManager.DeleteTask ( id )
