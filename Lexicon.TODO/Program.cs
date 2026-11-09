@@ -4,8 +4,7 @@ using Lexicon.TODO.Models;
 using Lexicon.TODO.Services;
 
 var taskManager = new TaskManager ();
-
-AddSampleTasks ( taskManager );
+var taskStorage = new TaskStorage ( "tasks.json" );
 
 try
 {
@@ -38,8 +37,12 @@ try
 				break;
 
 			case MainMenuOption.Quit:
+			{
+				taskStorage.SaveTasks ( [.. taskManager.Tasks] );
 				Console.WriteLine ( "Exiting..." );
+
 				return 0;
+			}
 
 			default:
 				Console.WriteLine ( "Invalid choice. Please try again." );
@@ -54,14 +57,4 @@ catch (EndOfStreamException)
 {
 	Console.WriteLine ( "Input ended unexpectedly. Exiting..." );
 	return 1;
-}
-
-// Seeds demo data relative to today so one task is overdue and two are upcoming.
-static void AddSampleTasks ( TaskManager taskManager )
-{
-	var today = DateTime.Today;
-
-	taskManager.AddTask ( "Finish project report", today.AddDays ( 5 ), "Work" );
-	taskManager.AddTask ( "Grocery shopping", today.AddDays ( -2 ), "Personal" );
-	taskManager.AddTask ( "Doctor's appointment", today.AddDays ( 1 ), "Health" );
 }

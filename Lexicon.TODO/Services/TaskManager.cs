@@ -99,6 +99,21 @@ public sealed class TaskManager ( TimeProvider? timeProvider = null )
 		.Where ( IsOverdue )
 		.ToList ()
 		.AsReadOnly ();
+	
+	/// <summary>
+	/// Gets a read-only list of all tasks managed by the <see cref="TaskManager"/>.
+	/// </summary>
+	/// <value>
+	/// A collection of <see cref="TaskItem"/> objects representing all tasks, regardless of their state.
+	/// </value>
+	/// <remarks>
+	/// This property provides a snapshot of the current tasks. Any modifications to the tasks
+	/// must be performed through the methods provided by the <see cref="TaskManager"/> class.
+	/// </remarks>
+	public IReadOnlyList<TaskItem> Tasks => tasks
+		.ToList()
+		.AsReadOnly();
+
 
 	/// <summary>
 	/// Gets the number of overdue tasks without materializing a list.

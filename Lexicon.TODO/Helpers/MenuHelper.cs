@@ -7,6 +7,13 @@ namespace Lexicon.TODO.Helpers;
 /// </summary>
 public static class MenuHelper
 {
+	/// <summary>
+	/// The color used for rendering divider lines in console menus.
+	/// </summary>
+	/// <remarks>
+	/// This constant is used to ensure consistent styling for divider lines
+	/// displayed in menus rendered by the <see cref="MenuHelper"/> class.
+	/// </remarks>
 	private const ConsoleColor DividerColor = ConsoleColor.DarkGray;
 
 	/// <summary>
