@@ -1,17 +1,27 @@
 ﻿namespace Lexicon.TODO;
 
 /// <summary>
-/// Holds the in-memory task list and the rules for changing it.
+/// Manages a collection of tasks, providing functionality to add, update, delete, and query tasks.
 /// </summary>
 /// <remarks>
-/// Ids are the current highest Id plus 1, so the highest Id can be reused after that task is deleted.
-/// Methods report a missing Id by returning <see langword="false"/> or <see langword="null"/>; they do not throw for it.
+/// This class maintains an in-memory list of tasks and enforces rules for managing them. 
+/// Task IDs are automatically generated based on the highest current ID, allowing reuse of IDs after deletion.
+/// Methods return <see langword="false"/> or <see langword="null"/> for invalid operations, instead of throwing exceptions.
 /// </remarks>
 public class TaskManager
 {
 	private readonly List<TaskItem> tasks = [];
 
-	/// <summary>The Id the next added task will get: 1 for an empty list, otherwise highest Id + 1.</summary>
+	/// <summary>
+	/// Gets the next available task ID.
+	/// </summary>
+	/// <value>
+	/// The next ID is calculated as one greater than the highest current task ID. 
+	/// If no tasks exist, the value is <c>1</c>.
+	/// </value>
+	/// <remarks>
+	/// This property ensures that task IDs are unique and sequential, even if tasks are deleted.
+	/// </remarks>
 	public int NextId => tasks.Count > 0 ? tasks.Max(t => t.Id) + 1 : 1;
 
 
@@ -66,9 +76,9 @@ public class TaskManager
 		if (!TryFindIndex(id, out var taskIndex))
 			return false;
 
-		var existingTask = tasks[taskIndex];
+		TaskItem existingTask = tasks[taskIndex];
 
-		var updatedTask = existingTask with
+		TaskItem updatedTask = existingTask with
 		{
 			Title = title?.Trim() ?? existingTask.Title,
 			DueDate = dueDate ?? existingTask.DueDate,
