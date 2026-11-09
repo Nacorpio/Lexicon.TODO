@@ -1,4 +1,6 @@
-﻿namespace Lexicon.TODO.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace Lexicon.TODO.Models;
 
 /// <summary>
 /// Represents a task item with details such as ID, title, due date, state, and associated project.
@@ -31,13 +33,15 @@ public record TaskItem (
 	/// <value>
 	/// <c>true</c> if the task's state is <see cref="TaskState.Completed"/>; otherwise, <c>false</c>.
 	/// </value>
+	[JsonIgnore]
 	public bool IsCompleted => State == TaskState.Completed;
-	
+
 	/// <summary>
 	/// Gets a value indicating whether the task is pending.
 	/// </summary>
 	/// <value>
 	/// <c>true</c> if the task state is <see cref="TaskState.Pending"/>; otherwise, <c>false</c>.
 	/// </value>
+	[JsonIgnore]
 	public bool IsPending => State == TaskState.Pending;
 }
