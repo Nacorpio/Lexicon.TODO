@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Lexicon.TODO.Models;
 
@@ -23,7 +24,8 @@ public class TaskStorage
 	private static readonly JsonSerializerOptions JsonOptions = new ()
 	{
 		WriteIndented = true,
-		Converters = { new JsonStringEnumConverter () }
+		Converters = { new JsonStringEnumConverter () },
+		Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
 	};
 
 	/// <summary>
