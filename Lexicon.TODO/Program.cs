@@ -50,7 +50,7 @@ try
 				MenuHandlers.HandleEditTask ( taskManager );
 				break;
 
-			case MainMenuOption.Quit:
+			case MainMenuOption.SaveAndQuit:
 			{
 				try
 				{

@@ -199,7 +199,7 @@ public class MenuHelperTests
 		Assert.Equal ( 4, dividers.Length );
 		Assert.All ( dividers, d => Assert.Equal ( contentWidth, d.Length ) );
 		Assert.Contains ( "1. Show Tasks", lines );
-		Assert.Contains ( "4. Quit", lines );
+		Assert.Contains ( "4. Save and Quit", lines );
 	}
 
 	[Fact]

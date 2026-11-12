@@ -21,7 +21,7 @@ public enum MainMenuOption
 	EditTask = 3,
 
 	/// <summary>
-	/// Exit the application. Tasks are held in memory only and are not persisted.
+	/// Save the tasks to the data file, then exit the application.
 	/// </summary>
-	Quit = 4
+	SaveAndQuit = 4
 }
