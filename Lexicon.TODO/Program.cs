@@ -6,7 +6,17 @@ using Lexicon.TODO.Services;
 string filePath = Path.Combine ( AppContext.BaseDirectory, "Data", "tasks.json" );
 
 TaskStorage taskStorage = new ( filePath );
-TaskManager taskManager = new ();
+
+LoadResult loadResult = taskStorage.Load ();
+TaskManager taskManager = new ( loadResult.Tasks );
+
+if ( !loadResult.CanSave )
+{
+	Console.WriteLine ( $"Could not read {filePath}: {loadResult.Error}" );
+	Console.WriteLine ( "Starting empty. Changes will NOT be saved this session." );
+
+	InputHelper.WaitForEnter ( "Press Enter to continue..." );
+}
 
 taskStorage.Load ();
 
@@ -44,7 +54,8 @@ try
 			{
 				try
 				{
-					taskStorage.Save ( [.. taskManager.Tasks] );
+					if ( loadResult.CanSave )
+						taskStorage.Save ( [.. taskManager.Tasks] );
 				}
 				catch (Exception ex)
 				{

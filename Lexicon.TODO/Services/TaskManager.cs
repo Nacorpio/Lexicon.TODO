@@ -14,9 +14,9 @@ namespace Lexicon.TODO.Services;
 /// The clock used to decide which tasks are overdue. Defaults to <see cref="TimeProvider.System"/>.
 /// Tests pass a fixed provider so results do not depend on the wall clock.
 /// </param>
-public sealed class TaskManager ( TimeProvider? timeProvider = null )
+public sealed class TaskManager ( IEnumerable<TaskItem>? initialTasks = null, TimeProvider? timeProvider = null )
 {
-	private readonly List<TaskItem> tasks = [];
+	private readonly List<TaskItem> tasks = [.. initialTasks ?? []];
 	private readonly TimeProvider clock = timeProvider ?? TimeProvider.System;
 
 	/// <summary>

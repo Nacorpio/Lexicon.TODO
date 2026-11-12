@@ -72,26 +72,43 @@ public class TaskStorage
 	}
 
 	/// <summary>
-	/// Loads the list of tasks from the JSON file specified by <see cref="FilePath"/>.
+	/// Loads tasks from the JSON file specified by <see cref="FilePath"/>.
 	/// </summary>
 	/// <returns>
-	/// A <see cref="List{T}"/> of <see cref="TaskItem"/> objects representing the tasks.
-	/// If the file does not exist or is empty, an empty list is returned.
+	/// A <see cref="LoadResult"/> containing a list of <see cref="TaskItem"/> objects and an optional error message.
+	/// If the file does not exist, an empty list is returned without an error.
 	/// </returns>
 	/// <remarks>
-	/// This method reads the contents of the JSON file, deserializes it into a list of <see cref="TaskItem"/> objects,
-	/// and returns the result. If the file is missing, it safely returns an empty list to avoid exceptions.
+	/// This method attempts to read and deserialize the JSON file into a list of <see cref="TaskItem"/> objects.
+	/// If the file is missing, it safely returns an empty list. If an error occurs during deserialization or file access,
+	/// it captures the error message and includes it in the <see cref="LoadResult"/>.
 	/// </remarks>
 	/// <exception cref="JsonException">
 	/// Thrown if the JSON content in the file is invalid or cannot be deserialized into a list of <see cref="TaskItem"/>.
 	/// </exception>
-	public List<TaskItem> Load ()
+	/// <exception cref="IOException">
+	/// Thrown if an I/O error occurs while accessing the file.
+	/// </exception>
+	/// <exception cref="UnauthorizedAccessException">
+	/// Thrown if the application lacks the necessary permissions to access the file.
+	/// </exception>
+	public LoadResult Load ()
 	{
 		if ( !File.Exists ( FilePath ) )
-			return [];
+			return new LoadResult ( [] );
 
-		var json = File.ReadAllText ( FilePath );
+		try
+		{
+			var json = File.ReadAllText ( FilePath );
+			var tasks = JsonSerializer.Deserialize<List<TaskItem>> ( json, JsonOptions );
 
-		return JsonSerializer.Deserialize<List<TaskItem>> ( json, JsonOptions ) ?? [];
+			return tasks is null
+				? new LoadResult ( [], "The file is empty or invalid." )
+				: new LoadResult ( tasks );
+		}
+		catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
+		{
+			return new LoadResult ( [], ex.Message );
+		}
 	}
 }

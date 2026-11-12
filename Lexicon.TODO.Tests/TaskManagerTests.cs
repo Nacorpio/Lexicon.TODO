@@ -7,7 +7,7 @@ public class TaskManagerTests
 {
 	private static readonly DateTime Today = new ( 2026, 11, 9 );
 
-	private static TaskManager CreateManager () => new ( new FixedTimeProvider ( Today ) );
+	private static TaskManager CreateManager () => new ( [], new FixedTimeProvider ( Today ) );
 
 	[Fact]
 	public void AddTask_AssignsSequentialIdsStartingAtOne ()

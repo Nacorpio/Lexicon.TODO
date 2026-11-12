@@ -121,28 +121,20 @@ public static class MenuHandlers
 		switch ((EditMenuOption) choice)
 		{
 			case EditMenuOption.MarkAsCompleted:
-			{
 				HandleCompleteTask ( taskManager, id );
 				break;
-			}
 
 			case EditMenuOption.Delete:
-			{
 				HandleDeleteTask ( taskManager, id );
 				break;
-			}
 
 			case EditMenuOption.Update:
-			{
 				HandleUpdateTask ( taskManager, id );
 				break;
-			}
 
 			default:
-			{
 				Console.WriteLine ( "Invalid choice. Please try again." );
 				break;
-			}
 		}
 	}
 
@@ -179,23 +171,35 @@ public static class MenuHandlers
 		switch ((UpdateMenuOption) choice)
 		{
 			case UpdateMenuOption.EditTitle:
+			{
 				updated = taskManager.UpdateTask ( id,
 					title: InputHelper.ReadNonEmptyString ( "Enter new title: " ) );
+
 				break;
+			}
 
 			case UpdateMenuOption.EditDueDate:
+			{
 				updated = taskManager.UpdateTask ( id,
 					dueDate: InputHelper.ReadDateTime ( "Enter new due date (yyyy-MM-dd): " ) );
+
 				break;
+			}
 
 			case UpdateMenuOption.EditProject:
+			{
 				updated = taskManager.UpdateTask ( id,
 					project: InputHelper.ReadNonEmptyString ( "Enter new project name: " ) );
+
 				break;
+			}
 
 			default:
+			{
 				Console.WriteLine ( "Invalid choice. Please try again." );
+
 				return;
+			}
 		}
 
 		Console.WriteLine ( updated
