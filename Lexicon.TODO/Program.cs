@@ -24,8 +24,6 @@ if ( !loadResult.CanSave )
 	InputHelper.WaitForEnter ( "Press Enter to continue..." );
 }
 
-taskStorage.Load ();
-
 try
 {
 	while (true)
