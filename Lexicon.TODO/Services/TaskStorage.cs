@@ -23,8 +23,13 @@ public class TaskStorage
 	/// </remarks>
 	private static readonly JsonSerializerOptions JsonOptions = new ()
 	{
+		// Enables indented formatting for better readability of the JSON output.
 		WriteIndented = true,
+
+		// The JsonStringEnumConverter allows enum values to be serialized and deserialized as their string representations.
 		Converters = { new JsonStringEnumConverter () },
+
+		// The UnsafeRelaxedJsonEscaping encoder allows the use of Swedish characters in the JSON output without escaping them.
 		Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
 	};
 
@@ -104,6 +109,7 @@ public class TaskStorage
 			var json = File.ReadAllText ( FilePath );
 			var tasks = JsonSerializer.Deserialize<List<TaskItem>> ( json, JsonOptions );
 
+			// If the deserialized tasks are null, it indicates that the file was empty or invalid.
 			return tasks is null
 				? new LoadResult ( [], "The file is empty or invalid." )
 				: new LoadResult ( tasks );

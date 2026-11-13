@@ -75,13 +75,16 @@ public static class MenuHelper
 		Func<TEnum, string> getLabel )
 		where TEnum : struct, Enum
 	{
+		// Calculate the maximum width of the formatted menu items.
 		var width = menuItems
 			.Select ( option => FormatMenuItem ( option, getLabel ).Length )
 			.DefaultIfEmpty ( 0 )
 			.Max ();
 
+		// Compare with the header and description lengths to determine the final width.
 		width = Math.Max ( width, header.Length );
 
+		// If a description is provided, compare its length as well.
 		if ( !string.IsNullOrWhiteSpace ( description ) )
 			width = Math.Max ( width, description.Length );
 

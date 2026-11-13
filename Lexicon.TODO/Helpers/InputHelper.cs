@@ -40,6 +40,7 @@ public static class InputHelper
 		{
 			Console.Write ( prompt );
 
+			// Read the input, trim whitespace, and check if it's non-empty.
 			var input = ReadLineOrThrow ().Trim ();
 
 			if ( input.Length > 0 )
@@ -67,6 +68,7 @@ public static class InputHelper
 		{
 			Console.Write ( prompt );
 
+			// Read the input, trim whitespace, and convert to lowercase for comparison.
 			var input = ReadLineOrThrow ().Trim ().ToLowerInvariant ();
 
 			switch (input)
@@ -138,7 +140,10 @@ public static class InputHelper
 
 			var input = ReadLineOrThrow ();
 
-			if ( int.TryParse ( input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result ) )
+			if ( int.TryParse ( input,
+				    NumberStyles.Integer,
+				    CultureInfo.InvariantCulture,
+				    out var result ) )
 				return result;
 
 			Console.WriteLine ( "Invalid integer. Please try again." );
@@ -165,11 +170,13 @@ public static class InputHelper
 		{
 			Console.Write ( prompt );
 
+			// Read the input, trim whitespace, and check if it's empty.
 			var input = ReadLineOrThrow ().Trim ();
 
 			if ( input.Length == 0 )
 				return null;
 
+			// Attempt to parse the input as a DateTime using the specified format and culture.
 			if ( DateTime.TryParseExact ( input, "yyyy-MM-dd",
 				    CultureInfo.InvariantCulture,
 				    DateTimeStyles.None,

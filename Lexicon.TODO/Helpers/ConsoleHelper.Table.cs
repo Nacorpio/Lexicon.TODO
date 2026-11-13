@@ -104,25 +104,35 @@ public static partial class ConsoleHelper
 		IReadOnlyList<TaskItem> tasks )
 	{
 		int columnCount = columnDefs.Count;
+		
 		var widths = new int[columnCount];
 		var alignments = new ColumnAlignment[columnCount];
+		
 		var rows = new List<string[]> ( tasks.Count );
 
+		// Initialize column widths and alignments based on the column definitions.
 		for (int i = 0; i < columnCount; i++)
 		{
 			widths[i] = columnDefs[i].Header.Length;
 			alignments[i] = columnDefs[i].Alignment;
 		}
 
+		// Iterate through each task and calculate the maximum width for each column based on the values.
 		foreach ( TaskItem task in tasks )
 		{
 			var row = new string[columnCount];
 
+			// Populate the row with values and update column widths if necessary.
 			for (int i = 0; i < columnCount; i++)
 			{
-				var value = columnDefs[i].ValueSelector ( task ) ?? string.Empty;
+				// Use the value selector to get the string representation of the task for the current column.
+				var value = columnDefs[i].ValueSelector ( task );
+
 				row[i] = value;
-				if ( value.Length > widths[i] ) widths[i] = value.Length;
+
+				// Update the column width if the current value's length exceeds the previously recorded width.
+				if ( value.Length > widths[i] )
+					widths[i] = value.Length;
 			}
 
 			rows.Add ( row );
@@ -150,15 +160,18 @@ public static partial class ConsoleHelper
 	public static void PrintRow (
 		string[] columns, int[] widths, ColumnAlignment[] alignments, string separator, ConsoleColor? color = null )
 	{
+		// Validate that the lengths of the columns, widths, and alignments arrays are consistent.
 		if ( columns.Length != widths.Length || columns.Length != alignments.Length )
 			throw new ArgumentException ( "Columns, widths, and alignments must have the same length." );
 
 		for (var i = 0; i < columns.Length; i++)
 		{
+			// Print the separator before each column except the first one.
 			if ( i > 0 )
 				Print ( separator );
 
-			Print ( alignments[i] == ColumnAlignment.Right
+			// Print the column value with the specified alignment and width, applying color if provided.
+			Print( alignments[i] == ColumnAlignment.Right
 				? columns[i].PadLeft ( widths[i] )
 				: columns[i].PadRight ( widths[i] ), color );
 		}
